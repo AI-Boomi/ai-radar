@@ -1,13 +1,3 @@
-interface GeminiResponse {
-  candidates: Array<{
-    content: {
-      parts: Array<{
-        text: string;
-      }>;
-    };
-  }>;
-}
-
 interface SearchFilters {
   categories: string[];
   countries: string[];
@@ -18,14 +8,11 @@ interface SearchFilters {
 }
 
 export class GeminiService {
-  private apiKey: string;
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+  private baseUrl: string;
 
   constructor() {
-    this.apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('Gemini API key not found in environment variables');
-    }
+    // Use Netlify Edge Function
+    this.baseUrl = '/.netlify/functions/gemini-search';
   }
 
   async parseSearchQuery(query: string, availableData: {
@@ -34,126 +21,29 @@ export class GeminiService {
     states: string[];
     cities: string[];
   }): Promise<SearchFilters> {
-    if (!this.apiKey) {
-      return this.fallbackParsing(query, availableData);
-    }
-
     try {
-      const prompt = this.createPrompt(query, availableData);
-      
-      const response = await fetch(`${this.baseUrl}?key=${this.apiKey}`, {
+      const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{
-              text: prompt
-            }]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1000,
-          }
+          query,
+          availableData
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Gemini API error: ${response.status}`);
+        throw new Error(`Edge function error: ${response.status}`);
       }
 
-      const data: GeminiResponse = await response.json();
-      const aiResponse = data.candidates[0]?.content?.parts[0]?.text;
-
-      if (!aiResponse) {
-        throw new Error('No response from Gemini API');
-      }
-
-      return this.parseAIResponse(aiResponse, availableData);
+      const filters = await response.json();
+      return filters;
     } catch (error) {
-      console.error('Gemini API error:', error);
+      console.error('Gemini service error:', error);
+      // Return fallback parsing result
       return this.fallbackParsing(query, availableData);
     }
-  }
-
-  private createPrompt(query: string, availableData: {
-    categories: string[];
-    countries: string[];
-    states: string[];
-    cities: string[];
-  }): string {
-    return `You are an AI assistant helping users search through a database of AI/tech companies. 
-
-User query: "${query}"
-
-Available data to filter by:
-- Categories: ${availableData.categories.join(', ')}
-- Countries: ${availableData.countries.join(', ')}
-- States: ${availableData.states.join(', ')}
-- Cities: ${availableData.cities.join(', ')}
-
-Please analyze the user's query and return a JSON object with the following structure:
-{
-  "categories": ["exact category names that match the query"],
-  "countries": ["exact country names that match the query"],
-  "states": ["exact state names that match the query"],
-  "cities": ["exact city names that match the query"],
-  "foundedYearRange": [startYear, endYear] or null,
-  "keywords": ["relevant keywords for general search"]
-}
-
-Rules:
-1. Only include exact matches from the available data lists
-2. Be flexible with synonyms (e.g., "fintech" → "Financial Services", "healthcare" → "Healthcare & Medical Diagnostics")
-3. For locations, be smart about variations (e.g., "US" → "United States", "USA" → "United States")
-4. If no specific filters are mentioned, focus on keywords
-5. For year ranges, only include if specifically mentioned
-6. Return only valid JSON, no additional text
-
-Examples:
-- "Show me fintech companies" → {"categories": ["Financial Services"], "countries": [], "states": [], "cities": [], "foundedYearRange": null, "keywords": ["fintech", "financial"]}
-- "Companies in India" → {"categories": [], "countries": ["India"], "states": [], "cities": [], "foundedYearRange": null, "keywords": []}
-- "Healthcare startups in California" → {"categories": ["Healthcare & Medical Diagnostics"], "countries": [], "states": ["California"], "cities": [], "foundedYearRange": null, "keywords": ["healthcare", "startups"]}`;
-  }
-
-  private parseAIResponse(aiResponse: string, availableData: {
-    categories: string[];
-    countries: string[];
-    states: string[];
-    cities: string[];
-  }): SearchFilters {
-    try {
-      // Extract JSON from the response
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in AI response');
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]);
-      
-      // Validate and clean the response
-      return {
-        categories: this.validateArray(parsed.categories, availableData.categories),
-        countries: this.validateArray(parsed.countries, availableData.countries),
-        states: this.validateArray(parsed.states, availableData.states),
-        cities: this.validateArray(parsed.cities, availableData.cities),
-        foundedYearRange: parsed.foundedYearRange && Array.isArray(parsed.foundedYearRange) 
-          ? [parsed.foundedYearRange[0], parsed.foundedYearRange[1]] 
-          : undefined,
-        keywords: Array.isArray(parsed.keywords) ? parsed.keywords : []
-      };
-    } catch (error) {
-      console.error('Error parsing AI response:', error);
-      return this.fallbackParsing(aiResponse, availableData);
-    }
-  }
-
-  private validateArray(items: any, validItems: string[]): string[] {
-    if (!Array.isArray(items)) return [];
-    return items.filter(item => 
-      typeof item === 'string' && validItems.includes(item)
-    );
   }
 
   private fallbackParsing(query: string, availableData: {
