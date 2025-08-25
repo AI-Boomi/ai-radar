@@ -26,6 +26,7 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   const [showAddCompanySidebar, setShowAddCompanySidebar] = useState(false);
   const [showEditCompanySidebar, setShowEditCompanySidebar] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const { searchWithAI, isSearching, searchError } = useGeminiSearch();
 
   useEffect(() => {
@@ -39,20 +40,42 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   const handleAIQuery = async () => {
     if (!chatInput.trim()) return;
     
+    console.log('🚀 Starting AI query:', chatInput);
     setIsTyping(true);
+    setHasSearched(true);
     
     const availableData = {
       categories,
-      countries,
-      states,
-      cities: Array.from(new Set(companies.map(c => c.city))).sort()
+      locations: Array.from(new Set(companies.map(c => `${c.city}, ${c.state}, ${c.country}`))).sort(),
+      companies: companies.map(c => ({
+        id: c.id,
+        name: c.name,
+        category: c.category,
+        tags: c.tags,
+        description: c.description,
+        country: c.country,
+        state: c.state,
+        city: c.city,
+        founded: c.founded
+      }))
     };
+
+    console.log('📋 Available data for search:', availableData);
 
     try {
       const filters = await searchWithAI(chatInput, availableData);
       
+      console.log('🎯 Received filters from AI:', JSON.stringify(filters, null, 2));
+      
       if (filters) {
         // Apply the AI-generated filters
+        console.log('✅ Applying filters:', JSON.stringify({
+          categories: filters.categories,
+          countries: filters.countries,
+          states: filters.states,
+          yearRange: filters.foundedYearRange
+        }, null, 2));
+        
         setSelectedCategories(filters.categories);
         setSelectedCountries(filters.countries);
         setSelectedStates(filters.states);
@@ -62,30 +85,32 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
           setFoundedYearRange(filters.foundedYearRange);
         }
         
-        // If no specific filters were found but we have keywords, 
-        // we could implement a text-based search here in the future
-        if (filters.categories.length === 0 && 
-            filters.countries.length === 0 && 
-            filters.states.length === 0 && 
-            filters.keywords.length > 0) {
-          // For now, just clear filters to show all results
-          // In the future, this could filter by description/name matching
-        }
+        console.log('✅ Filters applied successfully');
+      } else {
+        console.error('❌ No filters returned from AI search');
       }
     } catch (error) {
-      console.error('AI search failed:', error);
-      // Fallback to clearing filters
-      setSelectedCategories([]);
-      setSelectedCountries([]);
-      setSelectedStates([]);
+      console.error('💥 AI search failed:', error);
+      // Don't clear filters on error, keep the search state
+      // This will show "No Results Found" message
     } finally {
-
+      console.log('🏁 AI search completed');
       setChatInput('');
       setIsTyping(false);
     }
   };
 
   const filteredCompanies = useMemo(() => {
+    // If user has searched but all filters are empty, show no results
+    if (hasSearched && 
+        selectedCategories.length === 0 && 
+        selectedCountries.length === 0 && 
+        selectedStates.length === 0 &&
+        foundedYearRange[0] === 2010 && 
+        foundedYearRange[1] === 2025) {
+      return [];
+    }
+    
     return companies.filter(company => {
       const matchesCategory = selectedCategories.length === 0 ||
                              selectedCategories.some(selectedCat =>
@@ -104,7 +129,7 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
       
       return matchesCategory && matchesCountry && matchesState && matchesFoundedYear;
     });
-  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange]);
+  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange, hasSearched]);
 
   const categories = useMemo(() => 
     Array.from(new Set(companies.flatMap(c => [c.category, ...c.tags]))).sort(), [companies]
@@ -296,32 +321,82 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
         </div>
 
         {/* Results Counter */}
-        {(selectedCategories.length > 0 || selectedCountries.length > 0 || selectedStates.length > 0) && (
+        {hasSearched && (
           <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-800/40 border border-gray-600/40 backdrop-blur-sm animate-fade-in">
-              <Zap className="h-4 w-4 text-emerald-400 animate-pulse" />
-              <span className="text-gray-300 font-light">
-                Found <span className="text-emerald-400 font-semibold animate-pulse">{filteredCompanies.length}</span> companies
-              </span>
-            </div>
+            {filteredCompanies.length > 0 ? (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-800/40 border border-gray-600/40 backdrop-blur-sm animate-fade-in">
+                <Zap className="h-4 w-4 text-emerald-400 animate-pulse" />
+                <span className="text-gray-300 font-light">
+                  Found <span className="text-emerald-400 font-semibold animate-pulse">{filteredCompanies.length}</span> companies
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-red-800/40 border border-red-600/40 backdrop-blur-sm animate-fade-in">
+                <AlertCircle className="h-4 w-4 text-red-400" />
+                <span className="text-gray-300 font-light">
+                  No companies match your search
+                </span>
+              </div>
+            )}
           </div>
         )}
 
         {/* Company Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredCompanies.map((company, index) => (
-            <div
-              key={company.id}
-              className="animate-fade-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <CompanyCard 
-                company={company} 
-                onCompanySelect={handleCompanySelect}
-              />
+        {filteredCompanies.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredCompanies.map((company, index) => (
+              <div
+                key={company.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CompanyCard 
+                  company={company} 
+                  onCompanySelect={handleCompanySelect}
+                />
+              </div>
+            ))}
+          </div>
+        ) : hasSearched ? (
+          <div className="text-center py-16">
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-gray-800/60 rounded-full flex items-center justify-center mx-auto mb-6">
+                <AlertCircle className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-300 mb-3">No Results Found</h3>
+              <p className="text-gray-400 mb-6">
+                Try adjusting your search terms or browse all companies by clearing the search.
+              </p>
+              <button
+                onClick={() => {
+                  setHasSearched(false);
+                  setSelectedCategories([]);
+                  setSelectedCountries([]);
+                  setSelectedStates([]);
+                  setFoundedYearRange([2010, 2025]);
+                }}
+                className="px-6 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 hover:border-emerald-400/60 rounded-lg text-emerald-300 hover:text-emerald-200 transition-all duration-200 font-medium"
+              >
+                Show All Companies
+              </button>
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {companies.map((company, index) => (
+              <div
+                key={company.id}
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <CompanyCard 
+                  company={company} 
+                  onCompanySelect={handleCompanySelect}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Filter Sidebar */}
         <FilterSidebar

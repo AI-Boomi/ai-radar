@@ -49,11 +49,11 @@ export default async (request: Request) => {
     // Get Gemini API key from Netlify environment
     const apiKey = Deno.env.get('GEMINI_API_KEY');
     if (!apiKey) {
-      console.warn('Gemini API key not found, using fallback parsing');
-      const fallbackResult = fallbackParsing(query, availableData);
+      console.error('❌ GEMINI_API_KEY not found in environment variables');
       return new Response(
-        JSON.stringify(fallbackResult),
+        JSON.stringify({ error: "Gemini API key not configured" }),
         {
+          status: 500,
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
@@ -62,11 +62,52 @@ export default async (request: Request) => {
       );
     }
 
-    // Create prompt for Gemini
-    const prompt = createPrompt(query, availableData);
+    console.log('🔑 Gemini API key found, proceeding with AI search');
+    console.log('📝 Query:', query);
+    console.log('📊 Company count:', availableData.companies?.length || 0);
+
+    // Create intelligent prompt with actual company data
+    const prompt = `You are an intelligent company search system. Analyze the user query against the actual company database and return appropriate filters.
+
+User Query: "${query}"
+
+Company Database:
+${JSON.stringify(availableData.companies, null, 2)}
+
+Available Categories: ${availableData.categories.join(', ')}
+
+INSTRUCTIONS:
+1. Analyze the user query against the actual company data (names, descriptions, categories, tags, locations)
+2. Return ONLY a valid JSON object with filter criteria
+3. Be intelligent about matching:
+   - "fintech" should match companies with "Financial Services" category or finance-related descriptions
+   - "AI companies" should match companies with AI/ML tags or AI-related descriptions
+   - "customer service" should match companies whose descriptions mention customer service/support
+   - Location queries should match the exact country/state/city names from the data
+4. Use exact values from the database only
+
+Required JSON format:
+{
+  "categories": [],
+  "countries": [],
+  "states": [],
+  "cities": [],
+  "foundedYearRange": null,
+  "keywords": []
+}
+
+Examples:
+Query: "fintech companies" → Look for companies with Financial Services category or finance-related descriptions
+Query: "AI companies in India" → Look for AI/ML companies AND filter by country="India"
+Query: "customer service automation" → Look for companies whose descriptions mention customer service/support
+Query: "companies founded after 2020" → Set foundedYearRange: [2021, 2025]
+
+Return ONLY the JSON filter object, no other text.`;
+
+    console.log('🤖 Sending enhanced prompt to Gemini...');
     
-    // Call Gemini API with correct model
-    const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+    // Call Gemini API
+    const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
     
     const response = await fetch(`${geminiUrl}?key=${apiKey}`, {
       method: 'POST',
@@ -86,21 +127,62 @@ export default async (request: Request) => {
       })
     });
 
+    console.log('📡 Gemini response status:', response.status);
+
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Gemini API error:', response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
     }
 
     const data: GeminiResponse = await response.json();
+    console.log('📦 Raw Gemini response received');
+    
     const aiResponse = data.candidates[0]?.content?.parts[0]?.text;
 
     if (!aiResponse) {
+      console.error('❌ No response text from Gemini');
       throw new Error('No response from Gemini API');
     }
 
-    const parsedFilters = parseAIResponse(aiResponse, availableData);
+    console.log('🤖 AI Response Text:', aiResponse);
+
+    // Parse the JSON response
+    let parsedFilters: SearchFilters;
+    try {
+      // Clean the response - remove any markdown formatting
+      const cleanResponse = aiResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      console.log('🧹 Cleaned response:', cleanResponse);
+      
+      parsedFilters = JSON.parse(cleanResponse);
+      console.log('✅ Parsed filters:', JSON.stringify(parsedFilters, null, 2));
+    } catch (parseError) {
+      console.error('❌ JSON parse error:', parseError);
+      console.error('❌ Failed to parse:', aiResponse);
+      throw new Error(`Failed to parse AI response as JSON: ${parseError}`);
+    }
+
+    // Extract available values from the actual company data
+    const availableCountries = Array.from(new Set(availableData.companies.map((c: any) => c.country))).sort();
+    const availableStates = Array.from(new Set(availableData.companies.map((c: any) => c.state))).sort();
+    const availableCities = Array.from(new Set(availableData.companies.map((c: any) => c.city))).sort();
+
+    // Validate the parsed filters against actual data
+    const validatedFilters: SearchFilters = {
+      categories: validateStringArray(parsedFilters.categories, availableData.categories),
+      countries: validateStringArray(parsedFilters.countries, availableCountries),
+      states: validateStringArray(parsedFilters.states, availableStates),
+      cities: validateStringArray(parsedFilters.cities, availableCities),
+      foundedYearRange: parsedFilters.foundedYearRange && Array.isArray(parsedFilters.foundedYearRange) 
+        ? [parsedFilters.foundedYearRange[0], parsedFilters.foundedYearRange[1]] 
+        : undefined,
+      keywords: Array.isArray(parsedFilters.keywords) ? parsedFilters.keywords : []
+    };
+
+    console.log('✅ Final validated filters:', JSON.stringify(validatedFilters, null, 2));
     
     return new Response(
-      JSON.stringify(parsedFilters),
+      JSON.stringify(validatedFilters),
       {
         headers: {
           "Content-Type": "application/json",
@@ -110,198 +192,42 @@ export default async (request: Request) => {
     );
 
   } catch (error) {
-    console.error('Gemini search error:', error);
+    console.error('💥 Edge function error:', error);
     
-    // Fallback to simple parsing on error
-    try {
-      const { query, availableData } = await request.json();
-      const fallbackResult = fallbackParsing(query, availableData);
-      
-      return new Response(
-        JSON.stringify(fallbackResult),
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
-    } catch (fallbackError) {
-      return new Response(
-        JSON.stringify({ error: "Search failed" }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
-    }
+    return new Response(
+      JSON.stringify({ 
+        error: "Search failed", 
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    );
   }
 };
 
-function createPrompt(query: string, availableData: {
-  categories: string[];
-  countries: string[];
-  states: string[];
-  cities: string[];
-}): string {
-  return `You are an AI assistant helping users search through a database of AI/tech companies. 
-
-User query: "${query}"
-
-Available data to filter by:
-- Categories: ${availableData.categories.join(', ')}
-- Countries: ${availableData.countries.join(', ')}
-- States: ${availableData.states.join(', ')}
-- Cities: ${availableData.cities.join(', ')}
-
-Please analyze the user's query and return a JSON object with the following structure:
-{
-  "categories": ["exact category names that match the query"],
-  "countries": ["exact country names that match the query"],
-  "states": ["exact state names that match the query"],
-  "cities": ["exact city names that match the query"],
-  "foundedYearRange": [startYear, endYear] or null,
-  "keywords": ["relevant keywords for general search"]
-}
-
-Rules:
-1. Only include exact matches from the available data lists
-2. Be flexible with synonyms (e.g., "fintech" → "Financial Services", "healthcare" → "Healthcare & Medical Diagnostics")
-3. For locations, be smart about variations (e.g., "US" → "United States", "USA" → "United States")
-4. If no specific filters are mentioned, focus on keywords
-5. For year ranges, only include if specifically mentioned
-6. Return only valid JSON, no additional text
-
-Examples:
-- "Show me fintech companies" → {"categories": ["Financial Services"], "countries": [], "states": [], "cities": [], "foundedYearRange": null, "keywords": ["fintech", "financial"]}
-- "Companies in India" → {"categories": [], "countries": ["India"], "states": [], "cities": [], "foundedYearRange": null, "keywords": []}
-- "Healthcare startups in California" → {"categories": ["Healthcare & Medical Diagnostics"], "countries": [], "states": ["California"], "cities": [], "foundedYearRange": null, "keywords": ["healthcare", "startups"]}`;
-}
-
-function parseAIResponse(aiResponse: string, availableData: {
-  categories: string[];
-  countries: string[];
-  states: string[];
-  cities: string[];
-}): SearchFilters {
-  try {
-    // Extract JSON from the response
-    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('No JSON found in AI response');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    
-    // Validate and clean the response
-    return {
-      categories: validateArray(parsed.categories, availableData.categories),
-      countries: validateArray(parsed.countries, availableData.countries),
-      states: validateArray(parsed.states, availableData.states),
-      cities: validateArray(parsed.cities, availableData.cities),
-      foundedYearRange: parsed.foundedYearRange && Array.isArray(parsed.foundedYearRange) 
-        ? [parsed.foundedYearRange[0], parsed.foundedYearRange[1]] 
-        : undefined,
-      keywords: Array.isArray(parsed.keywords) ? parsed.keywords : []
-    };
-  } catch (error) {
-    console.error('Error parsing AI response:', error);
-    throw error;
+function validateStringArray(items: any, validItems: string[]): string[] {
+  if (!Array.isArray(items)) {
+    console.warn('⚠️ Expected array, got:', typeof items, items);
+    return [];
   }
-}
-
-function validateArray(items: any, validItems: string[]): string[] {
-  if (!Array.isArray(items)) return [];
-  return items.filter(item => 
-    typeof item === 'string' && validItems.includes(item)
-  );
-}
-
-function fallbackParsing(query: string, availableData: {
-  categories: string[];
-  countries: string[];
-  states: string[];
-  cities: string[];
-}): SearchFilters {
-  const lowerQuery = query.toLowerCase();
-  const filters: SearchFilters = {
-    categories: [],
-    countries: [],
-    states: [],
-    cities: [],
-    keywords: [query]
-  };
-
-  // Simple keyword matching for categories
-  const categoryMappings: { [key: string]: string[] } = {
-    'financial': ['Financial Services'],
-    'fintech': ['Financial Services'],
-    'healthcare': ['Healthcare & Medical Diagnostics', 'Healthcare'],
-    'health': ['Healthcare & Medical Diagnostics', 'Healthcare'],
-    'medical': ['Healthcare & Medical Diagnostics'],
-    'marketing': ['Marketing, Sales & Customer Engagement'],
-    'sales': ['Marketing, Sales & Customer Engagement'],
-    'customer': ['Marketing, Sales & Customer Engagement', 'Customer Service & Engagement'],
-    'ai': ['AI/ML'],
-    'ml': ['AI/ML'],
-    'artificial intelligence': ['AI/ML'],
-    'machine learning': ['AI/ML'],
-    'edtech': ['Recruitment, HR, Training & EdTech'],
-    'education': ['Recruitment, HR, Training & EdTech'],
-    'hr': ['Recruitment, HR, Training & EdTech'],
-    'recruitment': ['Recruitment, HR, Training & EdTech'],
-    'cybersecurity': ['Cybersecurity'],
-    'security': ['Cybersecurity'],
-    'language': ['Language, Communication & Voice'],
-    'communication': ['Language, Communication & Voice'],
-    'voice': ['Language, Communication & Voice'],
-    'industry': ['Industry, Robotics, and IoT'],
-    'robotics': ['Industry, Robotics, and IoT'],
-    'iot': ['Industry, Robotics, and IoT']
-  };
-
-  // Check categories
-  for (const [keyword, categories] of Object.entries(categoryMappings)) {
-    if (lowerQuery.includes(keyword)) {
-      categories.forEach(cat => {
-        if (availableData.categories.includes(cat) && !filters.categories.includes(cat)) {
-          filters.categories.push(cat);
-        }
-      });
+  
+  const validated = items.filter(item => {
+    if (typeof item !== 'string') {
+      console.warn('⚠️ Non-string item filtered out:', item);
+      return false;
     }
-  }
-
-  // Check countries
-  const countryMappings: { [key: string]: string } = {
-    'us': 'US',
-    'usa': 'US',
-    'united states': 'US',
-    'america': 'US',
-    'india': 'India',
-    'indian': 'India'
-  };
-
-  for (const [keyword, country] of Object.entries(countryMappings)) {
-    if (lowerQuery.includes(keyword) && availableData.countries.includes(country)) {
-      filters.countries.push(country);
+    if (!validItems.includes(item)) {
+      console.warn('⚠️ Invalid item filtered out:', item, 'Valid options:', validItems);
+      return false;
     }
-  }
-
-  // Check states and cities directly
-  availableData.states.forEach(state => {
-    if (lowerQuery.includes(state.toLowerCase())) {
-      filters.states.push(state);
-    }
+    return true;
   });
-
-  availableData.cities.forEach(city => {
-    if (lowerQuery.includes(city.toLowerCase())) {
-      filters.cities.push(city);
-    }
-  });
-
-  return filters;
+  
+  console.log('✅ Validated array:', validated);
+  return validated;
 }

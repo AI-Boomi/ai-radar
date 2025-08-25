@@ -1,44 +1,38 @@
 import { useState } from 'react';
-import { GeminiService } from '../services/geminiService';
+import { geminiService } from '../services/geminiService';
+import type { SearchFilters } from '../types/company';
 
-interface SearchFilters {
-  categories: string[];
-  countries: string[];
-  states: string[];
-  cities: string[];
-  foundedYearRange?: [number, number];
-  keywords: string[];
-}
-
-export const useGeminiSearch = () => {
+export function useGeminiSearch() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const geminiService = new GeminiService();
 
   const searchWithAI = async (
     query: string,
     availableData: {
       categories: string[];
-      countries: string[];
-      states: string[];
-      cities: string[];
+      locations: string[];
+      companies: any[];
     }
   ): Promise<SearchFilters | null> => {
-    if (!query.trim()) return null;
+    console.log('🔧 useGeminiSearch hook called with:', query);
+    console.log('🔍 Starting AI search with query:', query);
+    console.log('📊 Available data:', availableData);
 
     setIsSearching(true);
     setSearchError(null);
 
     try {
       const filters = await geminiService.parseSearchQuery(query, availableData);
+      console.log('🔧 Hook received filters:', JSON.stringify(filters, null, 2));
+      setIsSearching(false);
+      setSearchError(null);
+      console.log('🔧 Hook search completed');
       return filters;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Search failed';
-      setSearchError(errorMessage);
-      console.error('Search error:', error);
-      return null;
-    } finally {
+      console.error('🚨 Hook search error:', error);
       setIsSearching(false);
+      setSearchError(error instanceof Error ? error.message : 'Search failed');
+      return null;
     }
   };
 
@@ -47,4 +41,4 @@ export const useGeminiSearch = () => {
     isSearching,
     searchError
   };
-};
+}
