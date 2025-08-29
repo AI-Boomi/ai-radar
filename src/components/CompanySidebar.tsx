@@ -78,9 +78,9 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ company, isOpen, onClos
       )}
       
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/60 z-50 transform transition-transform duration-500 ease-out shadow-2xl ${
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/60 z-50 transform transition-all duration-500 ease-out shadow-2xl ${
         isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      } ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
         
         {/* Header with gradient */}
         <div className={`relative bg-gradient-to-r ${getCategoryGradient([company.category])} p-6 shadow-lg`}>

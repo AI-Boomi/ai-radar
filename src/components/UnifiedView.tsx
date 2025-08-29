@@ -144,13 +144,18 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   );
 
   const handleCompanySelect = (company: Company) => {
+    // Ensure smooth animation by setting company first, then opening
     setSelectedCompany(company);
-    setIsSidebarOpen(true);
+    // Small delay to ensure company data is set before animation starts
+    setTimeout(() => {
+      setIsSidebarOpen(true);
+    }, 10);
   };
 
   const handleCloseSidebar = () => {
     setIsSidebarOpen(false);
-    setTimeout(() => setSelectedCompany(null), 300); // Wait for animation
+    // Wait for animation to complete before clearing company data
+    setTimeout(() => setSelectedCompany(null), 500);
   };
 
   const handleEditCompany = (company: Company) => {
