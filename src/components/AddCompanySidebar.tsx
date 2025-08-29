@@ -82,7 +82,7 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
               </p>
               
               <a
-                href="https://github.com/your-repo/ai-radar"
+                href="https://github.com/AI-Boomi/ai-radar-companies"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 px-4 py-3 bg-gray-800/60 hover:bg-gray-700/60 rounded-lg border border-gray-600/40 hover:border-gray-500/60 text-white transition-all duration-200 group"
@@ -116,7 +116,7 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
               <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/40">
                 <div className="text-sm text-gray-400 mb-2 font-mono">File path:</div>
                 <div className="text-emerald-400 font-mono text-base bg-gray-900/60 px-3 py-2 rounded border border-gray-700/60">
-                  public/companies.json
+                  companies.json
                 </div>
               </div>
 
@@ -127,7 +127,7 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
                 <ul className="text-gray-300 text-sm space-y-2 ml-4">
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-400 mt-1">•</span>
-                    <span>Click on <code className="bg-gray-800 px-2 py-1 rounded text-emerald-400">public/companies.json</code></span>
+                    <span>Click on <code className="bg-gray-800 px-2 py-1 rounded text-emerald-400">companies.json</code></span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-emerald-400 mt-1">•</span>
@@ -256,12 +256,12 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
               If you're new to GitHub or need assistance, feel free to reach out or check GitHub's documentation on creating pull requests.
             </p>
             <a
-              href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request"
+              href="https://github.com/AI-Boomi/ai-radar-companies"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
             >
-              <span>GitHub Pull Request Guide</span>
+              <span>View Repository</span>
               <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>

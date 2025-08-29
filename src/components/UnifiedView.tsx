@@ -326,7 +326,7 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
         </div>
 
         {/* Results Counter */}
-        {hasSearched && (
+        {hasSearched && !isSearching && (
           <div className="text-center mb-8">
             {filteredCompanies.length > 0 ? (
               <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gray-800/40 border border-gray-600/40 backdrop-blur-sm animate-fade-in">
@@ -346,8 +346,53 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
           </div>
         )}
 
+        {/* Searching State */}
+        {isSearching && (
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-blue-800/40 border border-blue-600/40 backdrop-blur-sm animate-fade-in">
+              <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-gray-300 font-light">
+                Searching
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Company Grid */}
-        {filteredCompanies.length > 0 ? (
+        {isSearching ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Show skeleton cards while searching */}
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="animate-pulse"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="h-full backdrop-blur-xl bg-gray-800/30 border border-gray-700/40 rounded-2xl p-6">
+                  <div className="mb-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-12 h-12 bg-gray-700/60 rounded-xl"></div>
+                        <div className="h-6 bg-gray-700/60 rounded w-32"></div>
+                      </div>
+                      <div className="w-8 h-8 bg-gray-700/60 rounded-lg"></div>
+                    </div>
+                    <div className="ml-15 space-y-2">
+                      <div className="h-4 bg-gray-700/60 rounded w-48"></div>
+                      <div className="h-6 bg-gray-700/60 rounded w-24"></div>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-6">
+                    <div className="h-4 bg-gray-700/60 rounded w-full"></div>
+                    <div className="h-4 bg-gray-700/60 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-700/60 rounded w-1/2"></div>
+                  </div>
+                  <div className="h-20 bg-gray-700/60 rounded-lg"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredCompanies.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCompanies.map((company, index) => (
               <div

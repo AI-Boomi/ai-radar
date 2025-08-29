@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Company } from '../types/company';
 
-const COMPANIES_URL = '/.netlify/functions/companies-proxy';
+// Use local file for development, Netlify function for production
+const COMPANIES_URL = import.meta.env.DEV 
+  ? '/companies.json' 
+  : '/.netlify/functions/companies-proxy';
+
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const CACHE_KEY = 'ai-radar-companies';
 const CACHE_TIMESTAMP_KEY = 'ai-radar-companies-timestamp';
