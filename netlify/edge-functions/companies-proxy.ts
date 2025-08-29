@@ -15,7 +15,7 @@ export default async (request: Request) => {
     console.log('🔄 Proxying request to GitHub for companies data...');
     
     // Fetch from GitHub
-    const githubUrl = 'https://raw.githubusercontent.com/AI-Boomi/ai-radar-companies/main/public/companies.json';
+    const githubUrl = 'https://raw.githubusercontent.com/AI-Boomi/ai-radar-companies/main/companies.json';
     const response = await fetch(githubUrl, {
       headers: {
         'Accept': 'application/json',
