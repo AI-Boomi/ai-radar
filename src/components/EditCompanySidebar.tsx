@@ -169,21 +169,18 @@ const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({ isOpen, onClose
               <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-700/60 overflow-x-auto">
                 <pre className="text-sm text-gray-300 whitespace-pre-wrap">
 {`{
-  "id": "${company.id}",
-  "name": "${company.name}",
-  "founded": ${company.founded},
-  "founders": [
-${company.founders.map(founder => `    "${founder}"`).join(',\n')}
-  ],
-  "website": "${company.website}",
-  "category": "${company.category}",
-  "tags": [${company.tags.map(tag => `"${tag}"`).join(', ')}],
-  "country": "${company.country}",
-  "state": "${company.state}",
-  "city": "${company.city}",
-  "logoUrl": "${company.logoUrl}",
-  "description": "${company.description}",
-  "linkedinProfile": "${company.linkedinProfile}"
+  "Name": "${company.name}",
+  "Founded": ${company.founded},
+  "Founders": "${company.founders.join(', ')}",
+  "Website": "${company.website}",
+  "Category": "${[company.category, ...company.tags].join(', ')}",
+  "Country": "${company.country}",
+  "State": "${company.state}",
+  "City": "${company.city}",
+  "Logo": "${company.logoUrl}",
+  "Description": "${company.description}",
+  "Linkedin Profile URL": "${company.linkedinProfile}",
+  "uuid": ${company.id}
 }`}
                 </pre>
               </div>

@@ -161,22 +161,18 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
               <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-700/60 overflow-x-auto">
                 <pre className="text-sm text-gray-300 whitespace-pre-wrap">
 {`{
-  "id": "your-unique-id",
-  "name": "Your Company Name",
-  "founded": 2024,
-  "founders": [
-    "Founder Name 1",
-    "Founder Name 2"
-  ],
-  "website": "https://yourcompany.com",
-  "category": "AI/ML",
-  "tags": ["AI", "Machine Learning", "SaaS"],
-  "country": "India",
-  "state": "Karnataka",
-  "city": "Bangalore",
-  "logoUrl": "https://your-logo-url.com/logo.png",
-  "description": "Brief description of what your company does...",
-  "linkedinProfile": "https://linkedin.com/company/yourcompany"
+  "Name": "Your Company Name",
+  "Founded": 2024,
+  "Founders": "Founder Name 1, Founder Name 2",
+  "Website": "https://yourcompany.com",
+  "Category": "AI/ML, Machine Learning, SaaS",
+  "Country": "India",
+  "State": "Karnataka",
+  "City": "Bangalore",
+  "Logo": "https://your-logo-url.com/logo.png",
+  "Description": "Brief description of what your company does...",
+  "Linkedin Profile URL": "https://linkedin.com/company/yourcompany",
+  "uuid": 123
 }`}
                 </pre>
               </div>
