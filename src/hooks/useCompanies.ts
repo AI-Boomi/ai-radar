@@ -81,6 +81,10 @@ export const useCompanies = () => {
         });
         
         if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          if (response.status === 422 && errorData?.error === "Invalid JSON data in repository") {
+            throw new Error(`Repository data error: ${errorData.details || 'Invalid JSON format in companies.json'}`);
+          }
           throw new Error(`Failed to fetch companies: ${response.status} ${response.statusText}`);
         }
         

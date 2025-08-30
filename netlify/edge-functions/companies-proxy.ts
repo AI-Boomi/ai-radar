@@ -28,7 +28,27 @@ export default async (request: Request) => {
       throw new Error(`GitHub fetch failed: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonError) {
+      console.error('❌ Invalid JSON in GitHub repository:', jsonError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid JSON data in repository", 
+          details: "The companies.json file contains invalid JSON. Please check for NaN values or other JSON syntax errors.",
+          suggestion: "Contact the repository maintainer to fix the JSON format"
+        }),
+        {
+          status: 422,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      );
+    }
+    
     console.log('✅ Successfully fetched companies data from GitHub');
 
     return new Response(

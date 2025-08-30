@@ -101,8 +101,8 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
   };
 
   const filteredCompanies = useMemo(() => {
-    // If user has searched but all filters are empty, show no results
-    if (hasSearched && 
+    // If user has searched, search is complete, but all filters are empty, show no results
+    if (hasSearched && !isSearching &&
         selectedCategories.length === 0 && 
         selectedCountries.length === 0 && 
         selectedStates.length === 0 &&
@@ -129,7 +129,7 @@ const UnifiedView: React.FC<UnifiedViewProps> = ({ companies }) => {
       
       return matchesCategory && matchesCountry && matchesState && matchesFoundedYear;
     });
-  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange, hasSearched]);
+  }, [companies, selectedCategories, selectedCountries, selectedStates, foundedYearRange, hasSearched, isSearching]);
 
   const categories = useMemo(() => 
     Array.from(new Set(companies.flatMap(c => [c.category, ...c.tags]))).sort(), [companies]
