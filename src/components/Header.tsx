@@ -1,32 +1,46 @@
-import React from 'react';
-import { Plus, SlidersHorizontal } from 'lucide-react';
+import React from "react";
+
+const LOGO_HEIGHT_PX = 35; // ← change this to the exact pixel height you want (e.g., 28, 30, 32)
+const HEADER_HEIGHT_PX = 200; // ← header gradient height (adjust if needed)
 
 const Header: React.FC = () => {
   return (
-    <header className="sticky top-0 z-50">
-      {/* Purple gradient bar */}
-      <div className="h-20 w-full bg-gradient-to-r from-[#4D19FF] via-[#7A2BFF] to-[#B33CFF]" />
+    <header className="relative">
+      {/* Top gradient bar: #35078d → #000000 */}
+      <div
+        className="w-full bg-gradient-to-b from-[#35078d] to-[#000000]"
+        style={{ height: HEADER_HEIGHT_PX }}
+      />
 
-      {/* Content aligned over the gradient */}
-      <div className="absolute inset-x-0 top-0 h-20 px-5 md:px-10 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="h-6 w-6 rounded-[8px] bg-white/90" />
-          <div className="text-white text-2xl font-semibold">
-            AIBoomi <span className="font-normal">Radar</span>
+      {/* Content aligned to the card grid container */}
+      <div className="absolute inset-0">
+        <div className="h-full max-w-[1400px] mx-auto px-4 md:px-8 flex items-center justify-between">
+          {/* Left: Logo pinned to the same left edge as the grid */}
+          <a href="/" className="inline-flex items-center">
+            <img
+              src="/assets/Radar-logo.svg"
+              alt="AIBoomi Radar"
+              className="block"
+              style={{ height: LOGO_HEIGHT_PX }}
+              draggable={false}
+            />
+          </a>
+
+          {/* Right: Buttons pinned to the same right edge as the grid */}
+          <div className="flex items-center gap-3">
+            <button
+              className="rounded-full bg-[#00FF66] text-black px-5 py-2 font-medium hover:opacity-90 transition"
+              type="button"
+            >
+              Add your company
+            </button>
+            <button
+              className="rounded-full border border-white/30 text-white px-5 py-2 hover:bg-white/5 transition"
+              type="button"
+            >
+              Filters
+            </button>
           </div>
-        </div>
-
-        {/* Primary actions */}
-        <div className="flex items-center gap-3">
-          <button className="btn btn-sm btn-primary">
-            <Plus className="h-4 w-4" />
-            Add your company
-          </button>
-          <button className="btn btn-sm btn-ghost border border-border">
-            <SlidersHorizontal className="h-4 w-4" />
-            Filters
-          </button>
         </div>
       </div>
     </header>

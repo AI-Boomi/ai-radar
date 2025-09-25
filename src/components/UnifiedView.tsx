@@ -1,6 +1,5 @@
-// src/components/UnifiedView.tsx
 import React, { useMemo, useState } from "react";
-import { Send, Linkedin, Twitter, MessageCircle } from "lucide-react";
+import { Linkedin, Twitter, MessageCircle } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { Company } from "../types/company";
 import CompanyCard from "./CompanyCard";
@@ -15,7 +14,6 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return companies;
-
     return companies.filter((c) => {
       const haystack = [
         c.name,
@@ -29,16 +27,15 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
-
       return haystack.includes(q);
     });
   }, [companies, query]);
 
   return (
-    <div className="max-w-[1400px] mx-auto">
-      {/* Search */}
+    <div className="max-w-[1400px] mx-auto px-4 md:px-8">
+      {/* Search pill */}
       <div className="mt-14 md:mt-16">
-        <div className="search-shell flex items-center gap-3">
+        <div className="search-shell flex items-center gap-3 border-[#E8F1DC]/70">
           <input
             className="search-input"
             placeholder="Ask me anything ‘Show me financial services companies’ or ‘Show me voice tech companies’"
@@ -49,20 +46,26 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
             }}
             aria-label="Search companies"
           />
+          {/* Your green circular search button using the provided SVG */}
           <button
             type="button"
-            className="h-11 w-11 rounded-full bg-accent text-black flex items-center justify-center"
-            aria-label="Submit search"
+            className="h-12 w-12 md:h-14 md:w-14 rounded-full grid place-items-center"
+            aria-label="Search"
             title="Search"
           >
-            <Send className="h-5 w-5" />
+            <img
+              src="/assets/Search-Button.svg"
+              alt=""
+              className="h-full w-full"
+              draggable={false}
+            />
           </button>
         </div>
 
-        {/* Social icons row (right aligned) */}
+        {/* Social icons, right aligned within the same container width */}
         <div className="flex items-center gap-4 mt-4 justify-end pr-1 text-foreground/70">
           <a href="#" aria-label="LinkedIn"><Linkedin className="h-4 w-4" /></a>
-          <a href="#" aria-label="Twitter"><Twitter className="h-4 w-4" /></a>
+          <a href="#" aria-label="Twitter / X"><Twitter className="h-4 w-4" /></a>
           <a href="#" aria-label="Messages"><MessageCircle className="h-4 w-4" /></a>
           <a href="#" aria-label="Discord" className="inline-flex items-center">
             <SiDiscord size={16} />
@@ -70,8 +73,8 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
         </div>
       </div>
 
-      {/* Divider */}
-      <div className="mt-10 h-px w-full bg-white/10" />
+      {/* Divider under search */}
+      <div className="mt-10 h-px w-full bg-[#E8F1DC]/70" />
 
       {/* Cards grid — 4 per row on xl, equal heights */}
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-7 items-stretch">
