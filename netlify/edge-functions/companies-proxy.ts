@@ -1,3 +1,5 @@
+import db from '../../public/companies.json';
+
 export default async (request: Request) => {
   // Handle CORS preflight requests
   if (request.method === "OPTIONS") {
@@ -13,42 +15,10 @@ export default async (request: Request) => {
 
   try {
     console.log('🔄 Proxying request to GitHub for companies data...');
-    
-    // Fetch from GitHub
-    const githubUrl = 'https://raw.githubusercontent.com/AI-Boomi/ai-radar-companies/main/companies.json';
-    const response = await fetch(githubUrl, {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'AI-Radar-App/1.0'
-      }
-    });
 
-    if (!response.ok) {
-      console.error('❌ GitHub fetch failed:', response.status, response.statusText);
-      throw new Error(`GitHub fetch failed: ${response.status} ${response.statusText}`);
-    }
-
-    let data;
-    try {
-      data = await response.json();
-    } catch (jsonError) {
-      console.error('❌ Invalid JSON in GitHub repository:', jsonError);
-      return new Response(
-        JSON.stringify({ 
-          error: "Invalid JSON data in repository", 
-          details: "The companies.json file contains invalid JSON. Please check for NaN values or other JSON syntax errors.",
-          suggestion: "Contact the repository maintainer to fix the JSON format"
-        }),
-        {
-          status: 422,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        }
-      );
-    }
-    
+    //hardcoding DB to local file
+    let data = db;
+  
     console.log('✅ Successfully fetched companies data from GitHub');
 
     return new Response(
