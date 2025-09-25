@@ -1,3 +1,73 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== Theme tokens (HSL for easy theming) ===== */
+:root{
+  --bg: 0 0% 0%;               /* black app background */
+  --fg: 0 0% 98%;              /* near-white text on black */
+  --border: 0 0% 18%;
+
+  /* Company card */
+  --card: 90 100% 96%;         /* #F8FFE9 */
+  --card-foreground: 0 0% 0%;  /* black text on card */
+
+  /* Accent & primary (used elsewhere) */
+  --primary-500: 259 95% 60%;
+  --primary-600: 259 95% 54%;
+  --primary-700: 259 95% 48%;
+  --accent: 145 92% 48%;       /* CTA green */
+}
+
+/* ===== Base ===== */
+@layer base{
+  html{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body{ @apply bg-background text-foreground font-sans; }
+}
+
+/* ===== Components ===== */
+@layer components{
+  /* Buttons */
+  .btn{ @apply inline-flex items-center gap-2 font-medium rounded-full transition-colors duration-200; }
+  .btn-sm{ @apply h-9 px-4 text-sm; }
+  .btn-primary{ @apply bg-accent text-black hover:opacity-90; }
+  .btn-ghost{ @apply bg-transparent text-foreground hover:bg-white/5; }
+
+  /* Search */
+  .search-shell{
+    @apply w-full max-w-5xl mx-auto rounded-full bg-transparent px-6 py-5;
+    border: 1px solid rgba(255,255,255,.20);
+  }
+  .search-input{ @apply w-full bg-transparent text-foreground focus:outline-none; }
+  .search-input::placeholder{ color: currentColor; opacity: .4; }
+
+  /* Company card */
+  .card{
+    @apply rounded-[22px];
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid #E8F1DC;            /* matches spec */
+    box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  }
+
+  /* Category badge */
+  .badge-purple{
+    @apply inline-flex items-center rounded-full px-3 py-1 font-medium;
+    background: #F1E6FF;
+    color: #6600FF;
+    font-family: "Instrument Sans", ui-sans-serif, system-ui;
+    font-size: 14px;
+    line-height: 18px;
+  }
+}
+
+/* ===== Utilities ===== */
+@layer utilities{
+  /* 3-line truncation without plugin */
+  .line-clamp-3{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+  }
+}

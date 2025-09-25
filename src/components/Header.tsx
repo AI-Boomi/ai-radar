@@ -1,18 +1,32 @@
 import React from 'react';
+import { Plus, SlidersHorizontal } from 'lucide-react';
 
 const Header: React.FC = () => {
   return (
-    <header className="fixed top-0 left-0 z-50 p-6 backdrop-blur-sm">
-      <div className="flex items-center space-x-3 group cursor-pointer transform hover:scale-105 transition-transform duration-300">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 via-cyan-500/20 to-purple-500/20 rounded-xl blur-lg opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-          <div className="relative bg-white/95 backdrop-blur-sm p-3 rounded-xl border border-white/30 shadow-xl group-hover:shadow-2xl transition-all duration-300">
-            <img 
-              src="https://saasboomi.org/wp-content/themes/saasboomi/img/logo.svg" 
-              alt="Logo" 
-              className="h-10 w-auto max-w-none group-hover:scale-110 transition-transform duration-300"
-            />
+    <header className="sticky top-0 z-50">
+      {/* Purple gradient bar */}
+      <div className="h-20 w-full bg-gradient-to-r from-[#4D19FF] via-[#7A2BFF] to-[#B33CFF]" />
+
+      {/* Content aligned over the gradient */}
+      <div className="absolute inset-x-0 top-0 h-20 px-5 md:px-10 flex items-center justify-between">
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div className="h-6 w-6 rounded-[8px] bg-white/90" />
+          <div className="text-white text-2xl font-semibold">
+            AIBoomi <span className="font-normal">Radar</span>
           </div>
+        </div>
+
+        {/* Primary actions */}
+        <div className="flex items-center gap-3">
+          <button className="btn btn-sm btn-primary">
+            <Plus className="h-4 w-4" />
+            Add your company
+          </button>
+          <button className="btn btn-sm btn-ghost border border-border">
+            <SlidersHorizontal className="h-4 w-4" />
+            Filters
+          </button>
         </div>
       </div>
     </header>
