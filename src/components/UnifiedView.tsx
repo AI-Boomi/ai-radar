@@ -1,12 +1,18 @@
+// src/components/UnifiedView.tsx
 import React, { useMemo, useState } from "react";
 import { Linkedin, Twitter, MessageCircle } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 import { Company } from "../types/company";
 import CompanyCard from "./CompanyCard";
 
-interface Props {
-  companies: Company[];
-}
+interface Props { companies: Company[]; }
+
+// easy knobs
+const SEARCH_H = 56;                 // height of pill and button
+const SEARCH_RADIUS = 9999;
+const SEARCH_FILL = "#2D0070";
+const SEARCH_STROKE = "#6600FF";
+const SEARCH_TEXT = "#BFC9AF";
 
 const UnifiedView: React.FC<Props> = ({ companies }) => {
   const [query, setQuery] = useState("");
@@ -16,67 +22,87 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
     if (!q) return companies;
     return companies.filter((c) => {
       const haystack = [
-        c.name,
-        c.description,
-        c.category,
-        ...(c.tags || []),
-        c.city,
-        c.state,
-        c.country,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+        c.name, c.description, c.category,
+        ...(c.tags || []), c.city, c.state, c.country,
+      ].filter(Boolean).join(" ").toLowerCase();
       return haystack.includes(q);
     });
   }, [companies, query]);
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-      {/* Search pill */}
-      <div className="mt-14 md:mt-16">
-        <div className="search-shell flex items-center gap-3 border-[#E8F1DC]/70">
-          <input
-            className="search-input"
-            placeholder="Ask me anything ‘Show me financial services companies’ or ‘Show me voice tech companies’"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") e.preventDefault();
+      {/* Same 4-col grid as cards; search spans 3 */}
+      <div className="mt-14 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center gap-6">
+        {/* SEARCH */}
+        <div className="col-span-1 sm:col-span-1 lg:col-span-2 xl:col-span-3">
+          <div
+            className="flex items-center w-full pl-6 pr-px" // <-- pr-px = 1px right padding
+            style={{
+              height: SEARCH_H,
+              borderRadius: SEARCH_RADIUS,
+              background: SEARCH_FILL,
+              border: `1px solid ${SEARCH_STROKE}`,
             }}
-            aria-label="Search companies"
-          />
-          {/* Your green circular search button using the provided SVG */}
-          <button
-            type="button"
-            className="h-12 w-12 md:h-14 md:w-14 rounded-full grid place-items-center"
-            aria-label="Search"
-            title="Search"
           >
-            <img
-              src="/assets/Search-Button.svg"
-              alt=""
-              className="h-full w-full"
-              draggable={false}
+            <input
+              className="w-full bg-transparent outline-none font-sans"
+              style={{
+                fontSize: 18,
+                lineHeight: "26px",
+                fontWeight: 400,
+                color: SEARCH_TEXT,
+              }}
+              placeholder="Ask me anything ‘Show me financial services companies’ or ‘Show me voice tech companies’"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
+              aria-label="Search companies"
             />
-          </button>
+            {/* Button sits inside with the same top/bottom (0) and right (1px) gap */}
+            <button
+              type="button"
+              className="ml-2 grid place-items-center shrink-0"
+              style={{ height: SEARCH_H, width: SEARCH_H, borderRadius: SEARCH_RADIUS }}
+              aria-label="Search"
+              title="Search"
+            >
+              <img
+                src="/assets/Search-Button.svg"
+                alt=""
+                className="h-full w-full"
+                draggable={false}
+              />
+            </button>
+          </div>
         </div>
 
-        {/* Social icons, right aligned within the same container width */}
-        <div className="flex items-center gap-4 mt-4 justify-end pr-1 text-foreground/70">
-          <a href="#" aria-label="LinkedIn"><Linkedin className="h-4 w-4" /></a>
-          <a href="#" aria-label="Twitter / X"><Twitter className="h-4 w-4" /></a>
-          <a href="#" aria-label="Messages"><MessageCircle className="h-4 w-4" /></a>
-          <a href="#" aria-label="Discord" className="inline-flex items-center">
-            <SiDiscord size={16} />
-          </a>
+        {/* SOCIAL icons in last column */}
+        <div className="col-span-1 flex items-center justify-end gap-3">
+          {[
+            <Linkedin key="li" className="h-4 w-4" />,
+            <Twitter key="tw" className="h-4 w-4" />,
+            <MessageCircle key="msg" className="h-4 w-4" />,
+            <SiDiscord key="dc" size={16} />,
+          ].map((Icon, i) => (
+            <span
+              key={i}
+              className="inline-flex items-center justify-center rounded-full"
+              style={{
+                width: 44, height: 44,
+                border: "1px solid rgba(191, 201, 175, 0.7)",
+                color: SEARCH_TEXT,
+              }}
+            >
+              {Icon}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* Divider under search */}
-      <div className="mt-10 h-px w-full bg-[#E8F1DC]/70" />
+      {/* Divider */}
+      <div className="mt-10 h-px w-full" style={{ background: "rgba(232, 241, 220, 0.7)" }} />
 
-      {/* Cards grid — 4 per row on xl, equal heights */}
+      {/* Cards grid */}
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-7 items-stretch">
         {filtered.map((c) => (
           <div key={c.id} className="h-full">

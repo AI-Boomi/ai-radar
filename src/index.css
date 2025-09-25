@@ -33,13 +33,16 @@
   .btn-primary{ @apply bg-accent text-black hover:opacity-90; }
   .btn-ghost{ @apply bg-transparent text-foreground hover:bg-white/5; }
 
-  /* Search */
-  .search-shell{
-    @apply w-full max-w-5xl mx-auto rounded-full bg-transparent px-6 py-5;
-    border: 1px solid rgba(255,255,255,.20);
+  @layer components{
+  /* Updated defaults (won't override inline colors) */
+  .search-shell{ border: 1px solid #6600FF; background: #2D0070; }
+  .search-input{
+    @apply font-sans;
+    font-size: 18px; line-height: 26px; font-weight: 400;
+    color: #BFC9AF;
   }
-  .search-input{ @apply w-full bg-transparent text-foreground focus:outline-none; }
-  .search-input::placeholder{ color: currentColor; opacity: .4; }
+  .search-input::placeholder{ color: #BFC9AF; }
+}
 
   /* Company card */
   .card{
