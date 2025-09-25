@@ -1,4 +1,3 @@
-// src/components/UnifiedView.tsx
 import React, { useMemo, useState } from "react";
 import { Linkedin, Twitter, MessageCircle } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
@@ -7,9 +6,8 @@ import CompanyCard from "./CompanyCard";
 
 interface Props { companies: Company[]; }
 
-// easy knobs
-const SEARCH_H = 56;                 // height of pill and button
-const SEARCH_RADIUS = 9999;
+const SEARCH_H = 56;
+const RADIUS = 9999;
 const SEARCH_FILL = "#2D0070";
 const SEARCH_STROKE = "#6600FF";
 const SEARCH_TEXT = "#BFC9AF";
@@ -31,71 +29,41 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 md:px-8">
-      {/* Same 4-col grid as cards; search spans 3 */}
+      {/* same 4-col grid as cards; search spans 3 */}
       <div className="mt-14 md:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-center gap-6">
         {/* SEARCH */}
         <div className="col-span-1 sm:col-span-1 lg:col-span-2 xl:col-span-3">
           <div
-            className="flex items-center w-full pl-6 pr-px" // <-- pr-px = 1px right padding
-            style={{
-              height: SEARCH_H,
-              borderRadius: SEARCH_RADIUS,
-              background: SEARCH_FILL,
-              border: `1px solid ${SEARCH_STROKE}`,
-            }}
+            className="flex items-center w-full pl-6 pr-px search-pill"
+            style={{ height: SEARCH_H, borderRadius: RADIUS, background: SEARCH_FILL, border: `1px solid ${SEARCH_STROKE}` }}
           >
             <input
-              className="w-full bg-transparent outline-none font-sans"
-              style={{
-                fontSize: 18,
-                lineHeight: "26px",
-                fontWeight: 400,
-                color: SEARCH_TEXT,
-              }}
+              className="search-input"
+              style={{ color: SEARCH_TEXT }}
               placeholder="Ask me anything ‘Show me financial services companies’ or ‘Show me voice tech companies’"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
               aria-label="Search companies"
             />
-            {/* Button sits inside with the same top/bottom (0) and right (1px) gap */}
             <button
               type="button"
-              className="ml-2 grid place-items-center shrink-0"
-              style={{ height: SEARCH_H, width: SEARCH_H, borderRadius: SEARCH_RADIUS }}
+              className="ml-2 btn-round shrink-0"
+              style={{ height: SEARCH_H, width: SEARCH_H, borderRadius: RADIUS }}
               aria-label="Search"
               title="Search"
             >
-              <img
-                src="/assets/Search-Button.svg"
-                alt=""
-                className="h-full w-full"
-                draggable={false}
-              />
+              <img src="/assets/Search-Button.svg" alt="" className="h-full w-full" draggable={false} />
             </button>
           </div>
         </div>
 
-        {/* SOCIAL icons in last column */}
+        {/* SOCIAL */}
         <div className="col-span-1 flex items-center justify-end gap-3">
-          {[
-            <Linkedin key="li" className="h-4 w-4" />,
-            <Twitter key="tw" className="h-4 w-4" />,
-            <MessageCircle key="msg" className="h-4 w-4" />,
-            <SiDiscord key="dc" size={16} />,
-          ].map((Icon, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center justify-center rounded-full"
-              style={{
-                width: 44, height: 44,
-                border: "1px solid rgba(191, 201, 175, 0.7)",
-                color: SEARCH_TEXT,
-              }}
-            >
-              {Icon}
-            </span>
-          ))}
+          <span className="social-icon"><Linkedin className="h-4 w-4" /></span>
+          <span className="social-icon"><Twitter className="h-4 w-4" /></span>
+          <span className="social-icon"><MessageCircle className="h-4 w-4" /></span>
+          <span className="social-icon"><SiDiscord size={16} /></span>
         </div>
       </div>
 
