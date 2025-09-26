@@ -28,9 +28,7 @@ const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({ isOpen, onClose
         {/* Header */}
         <div className="px-6 py-5 border-b border-[#E8F1DC1A] flex items-start justify-between">
           <div>
-            <h2 className="font-display text-[24px] leading-[28px] font-[700] text-white">
-              Edit company
-            </h2>
+            <h2 className="sidebar-title text-white">Edit company</h2>
             <p className="mt-2 text-white/80 text-[14px] leading-[18px]">
               Update <span className="text-white">{company.name}</span> via GitHub.
             </p>

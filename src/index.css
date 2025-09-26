@@ -47,7 +47,33 @@
   }
   .btn-outline:hover{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.5); }
 
-  /* Circular search button (wrap for the SVG) */
+  /* ---------- Sidebar title (matches card H2/Bold) ---------- */
+  .sidebar-title{
+    @apply font-display text-[28px] leading-[34px] sm:text-[32px] sm:leading-[38px] lg:text-[40px] lg:leading-[48px] font-[700];
+  }
+
+  /* ---------- Body / labels helpers for sidebars ---------- */
+  /* Body copy: Instrument Sans / 16 / 24 / regular */
+  .body-regular{
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, -apple-system,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Section label for // Founders in sidebars: Geist Mono / 12 / 18 / regular */
+  .label-founders{
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+      Consolas, "Liberation Mono", "Courier New", monospace !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
+    font-weight: 400 !important;
+    color: rgb(255 255 255 / 0.8) !important;
+  }
+
+  /* ---------- Circular search button (wrap for the SVG) ---------- */
   .btn-round{
     @apply grid place-items-center;
     transition: transform .18s ease, box-shadow .18s ease;
@@ -72,37 +98,34 @@
   }
   .search-input::placeholder{ color:#BFC9AF; }
 
-  /* Make the category pill hug its text, never stretch */
-.badge-hug{
-  display: inline-flex;            /* inline-level flex container */
-  align-self: flex-start;          /* if it ever becomes a flex item, don't stretch */
-  width: -webkit-fit-content;      /* Safari */
-  width: -moz-fit-content;         /* Firefox */
-  width: fit-content;              /* Standard */
-  max-width: 100%;
-  white-space: nowrap;             /* keep it on one line */
-}
+  /* ---------- Category pills (hug content) ---------- */
+  .badge-hug{
+    display: inline-flex;
+    align-self: flex-start;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    max-width: 100%;
+    white-space: nowrap;
+  }
 
-/* Category pill: hug content, but never get wider than a cap */
-.badge-wrap{
-  display: inline-block;     /* size to content */
-  align-self: flex-start;    /* don't stretch if parent is flex */
-  width: auto;
-  max-width: 28rem;          /* ← tune this (e.g., 22–32rem) */
-  white-space: normal;       /* allow wrapping */
-  overflow-wrap: anywhere;   /* break long words if needed */
-  word-break: normal;
-  border-radius: 9999px;     /* keeps pill corners while wrapping */
-}
+  .badge-wrap{
+    display: inline-block;
+    align-self: flex-start;
+    width: auto;
+    max-width: 28rem;          /* tune as needed */
+    white-space: normal;       /* allow wrapping */
+    overflow-wrap: anywhere;
+    word-break: normal;
+    border-radius: 9999px;
+  }
 
-/* Inner text: ellipsis when too long */
-.badge-text{
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;                /* prevents flex text from forcing growth */
-}
-
+  .badge-text{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
 
   /* ---------- Card ---------- */
   .card{
@@ -113,67 +136,44 @@
   }
 
   /* Card wrapper that holds the UNDER-glow */
-.card-wrap{
-  position: relative;
-  z-index: 0;            /* creates a stacking context for the glow behind */
-}
+  .card-wrap{ position: relative; z-index: 0; }
+  .card-wrap .card{
+    position: relative; z-index: 1;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .card-wrap::before{
+    content:"";
+    position:absolute;
+    left:10%; right:10%; bottom:-16px; height:32px;
+    border-radius:999px;
+    background: radial-gradient(ellipse at center, rgba(122,51,255,.55), rgba(122,51,255,0) 60%);
+    filter: blur(14px);
+    opacity: 0; pointer-events:none; z-index: -1;
+    transition: opacity .42s ease, transform .22s ease;
+  }
+  .card-wrap:hover .card{
+    transform: translateY(-4px);
+    border-color:#D6E7BC;
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.16),
+      0 26px 60px rgba(102,0,255,.45);
+  }
+  .card-wrap:hover::before{ opacity: 1; transform: scale(1.05); }
 
-/* keep the card above the glow */
-.card-wrap .card{
-  position: relative;
-  z-index: 1;
-  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-}
+  /* ---------- Category badge visual ---------- */
+  .badge-purple{
+    @apply inline-flex w-fit items-center rounded-full px-3 py-1 font-medium;
+    background:#F1E6FF; color:#6600FF;
+    font-family:"Instrument Sans", ui-sans-serif, system-ui;
+    font-size:14px; line-height:18px;
+  }
 
-/* the glow lives on the wrapper, not the card */
-.card-wrap::before{
-  content:"";
-  position:absolute;
-  left:10%;
-  right:10%;
-  bottom:-16px;          /* below the card */
-  height:32px;
-  border-radius:999px;
-  background: radial-gradient(ellipse at center, rgba(122,51,255,.55), rgba(122,51,255,0) 60%);
-  filter: blur(14px);
-  opacity: 0;
-  pointer-events:none;
-  z-index: -1;           /* explicitly behind the card */
-  transition: opacity .42s ease, transform .22s ease;
-}
-
-/* hover state: lift card + show glow */
-.card-wrap:hover .card{
-  transform: translateY(-4px);
-  border-color:#D6E7BC;
-  box-shadow:
-    0 14px 28px rgba(0,0,0,.16),
-    0 26px 60px rgba(102,0,255,.45);
-}
-.card-wrap:hover::before{
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-
-
-  /* ---------- Category badge ---------- */
- .badge-purple{
-  @apply inline-flex w-fit items-center rounded-full px-3 py-1 font-medium;
-  background:#F1E6FF; color:#6600FF;
-  font-family:"Instrument Sans", ui-sans-serif, system-ui;
-  font-size:14px; line-height:18px;
-}
-
-
-  /* ---------- Links (Website / Linkedin) ---------- */
+  /* ---------- Links (Website / Linkedin on cards) ---------- */
   .link-violet{
     color:#6600FF; text-decoration:none;
     transition: color .15s ease, text-underline-offset .15s ease;
   }
-  .link-violet:hover{
-    color:#7A33FF; text-decoration:underline; text-underline-offset:2px;
-  }
+  .link-violet:hover{ color:#7A33FF; text-decoration:underline; text-underline-offset:2px; }
 
   /* ---------- Social icon chips ---------- */
   .social-icon{
@@ -188,39 +188,32 @@
     border-color: #DCE6C9;
   }
 
-  /* ---------- Founders area (per latest spec) ---------- */
+  /* ---------- Founders area on CARD (black text spec) ---------- */
   .founder-label{
     color:#000;
-    /* experimental typographic trims (safe if unsupported) */
     leading-trim: both;
     text-edge: cap;
-
     font-family:"Geist Mono", ui-monospace, monospace;
-    font-size:12px;
-    font-style:normal;
-    font-weight:400;     /* per your latest message */
-    line-height:18px;    /* 150% */
+    font-size:12px; font-style:normal; font-weight:400; line-height:18px;
   }
-
   .founder-name{
     color:#000;
     font-family:Degular, ui-sans-serif, system-ui;
-    font-size:16px;
-    font-style:normal;
-    font-weight:700;     /* Desktop/H6/Bold */
-    line-height:20px;    /* 125% */
+    font-size:16px; font-style:normal; font-weight:700; line-height:20px;
   }
 }
 
 /* ===== Utilities ===== */
 @layer utilities{
-  /* 3-line truncation for descriptions */
-  .scroll-contain{ overscroll-behavior: contain; } /* keep wheel/touch inside */
+  /* Keep wheel/touch inside sidebars */
+  .scroll-contain{ overscroll-behavior: contain; }
   .scroll-area{
-  overscroll-behavior: contain;      /* keep wheel/touch inside the panel */
-  -webkit-overflow-scrolling: touch; /* momentum on iOS */
-  touch-action: pan-y;               /* allow vertical touch scrolling */
-}
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  /* 3-line truncation for descriptions (cards) */
   .line-clamp-3{
     display:-webkit-box;
     -webkit-box-orient:vertical;

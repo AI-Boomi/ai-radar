@@ -61,9 +61,7 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
         {/* Header */}
         <div className="shrink-0 px-6 py-6 border-b border-[#E8F1DC1A] flex items-start justify-between">
           <div>
-            <h2 className="font-display text-[24px] leading-[28px] font-[700] text-white">
-              Add your company
-            </h2>
+            <h2 className="sidebar-title text-white">Add your company</h2>
             <p className="mt-3 font-display text-[14px] leading-[20px] text-white/80">
               Ready to showcase your AI company?
             </p>

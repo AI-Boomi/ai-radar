@@ -70,7 +70,7 @@ const CompanyCard: React.FC<Props> = ({ company, stopCardClickOnLinks }) => {
         </div>
 
         {/* Divider */}
-        <hr className="mt-8 mb-6 border-t border-[#E8F1DC]" />
+        <hr className="mt-4 mb-4 border-t border-[#E8F1DC]" />
 
         {/* Founders */}
         <div className="founder-label">// Founders</div>

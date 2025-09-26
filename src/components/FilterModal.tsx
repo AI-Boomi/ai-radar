@@ -63,9 +63,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = (props) => {
         {/* Header */}
         <div className="px-6 py-5 border-b border-[#E8F1DC1A] flex items-start justify-between">
           <div>
-            <h2 className="font-display text-[24px] leading-[28px] font-[700] text-white">
-              Filters
-            </h2>
+            <h2 className="sidebar-title text-white">Filters</h2>
             <p className="mt-2 text-white/80 text-[13px] leading-[16px]">
               Refine your radar discovery
               {activeFiltersCount > 0 && (

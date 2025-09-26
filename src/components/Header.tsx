@@ -5,12 +5,13 @@ import { SiDiscord } from "react-icons/si";
 type Props = {
   onOpenAdd: () => void;
   onOpenFilters: () => void;
+  activeFilterCount?: number; // ← new (optional)
 };
 
 const LOGO_HEIGHT_PX = 35;
 const HEADER_HEIGHT_PX = 200;
 
-const Header: React.FC<Props> = ({ onOpenAdd, onOpenFilters }) => {
+const Header: React.FC<Props> = ({ onOpenAdd, onOpenFilters, activeFilterCount = 0 }) => {
   return (
     <header className="relative">
       <div
@@ -30,12 +31,29 @@ const Header: React.FC<Props> = ({ onOpenAdd, onOpenFilters }) => {
                 draggable={false}
               />
             </a>
+
             <div className="flex items-center gap-3">
               <button className="btn btn-green" type="button" onClick={onOpenAdd}>
                 Add your company
               </button>
-              <button className="btn btn-outline" type="button" onClick={onOpenFilters}>
+
+              <button
+                className="relative btn btn-outline"
+                type="button"
+                onClick={onOpenFilters}
+                aria-label={`Filters${activeFilterCount ? `, ${activeFilterCount} active` : ""}`}
+              >
                 Filters
+                {activeFilterCount > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1.5
+                               rounded-full bg-[#FF3B30] text-white text-[11px] font-semibold
+                               leading-[18px] text-center ring-2 ring-black"
+                    aria-live="polite"
+                  >
+                    {activeFilterCount}
+                  </span>
+                )}
               </button>
             </div>
           </div>
