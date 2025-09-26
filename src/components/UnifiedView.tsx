@@ -4,16 +4,17 @@ import CompanyCard from "./CompanyCard";
 
 interface Props {
   companies: Company[];
+  onOpenCompany: (c: Company) => void;
 }
 
-// Search bar styling knobs
+// search styling
 const SEARCH_H = 56;
 const RADIUS = 9999;
 const SEARCH_FILL = "#2D0070";
 const SEARCH_STROKE = "#6600FF";
 const SEARCH_TEXT = "#BFC9AF";
 
-const UnifiedView: React.FC<Props> = ({ companies }) => {
+const UnifiedView: React.FC<Props> = ({ companies, onOpenCompany }) => {
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -21,17 +22,9 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
     if (!q) return companies;
     return companies.filter((c) => {
       const haystack = [
-        c.name,
-        c.description,
-        c.category,
-        ...(c.tags || []),
-        c.city,
-        c.state,
-        c.country,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+        c.name, c.description, c.category,
+        ...(c.tags || []), c.city, c.state, c.country,
+      ].filter(Boolean).join(" ").toLowerCase();
       return haystack.includes(q);
     });
   }, [companies, query]);
@@ -55,9 +48,7 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
             placeholder="Ask me anything ‘Show me financial services companies’ or ‘Show me voice tech companies’"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") e.preventDefault();
-            }}
+            onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
             aria-label="Search companies"
           />
           <button
@@ -67,28 +58,30 @@ const UnifiedView: React.FC<Props> = ({ companies }) => {
             aria-label="Search"
             title="Search"
           >
-            <img
-              src="/assets/Search-Button.svg"
-              alt=""
-              className="h-full w-full"
-              draggable={false}
-            />
+            <img src="/assets/Search-Button.svg" alt="" className="h-full w-full" draggable={false} />
           </button>
         </div>
       </div>
 
       {/* Divider */}
-      <div
-        className="mt-10 h-px w-full"
-        style={{ background: "rgba(232, 241, 220, 0.7)" }}
-      />
+      <div className="mt-10 h-px w-full" style={{ background: "rgba(232, 241, 220, 0.7)" }} />
 
-      {/* Cards grid */}
+      {/* Cards grid — clicking opens CompanySidebar */}
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-7 items-stretch">
         {filtered.map((c) => (
-          <div key={c.id} className="h-full">
-            <CompanyCard company={c} />
-          </div>
+          <button
+            key={c.id}
+            type="button"
+            onClick={() => onOpenCompany(c)}
+            className="text-left h-full focus:outline-none"
+            style={{ WebkitTapHighlightColor: "transparent" }}
+          >
+            <CompanyCard
+              company={c}
+              // ensure links inside the card don't open the sidebar
+              stopCardClickOnLinks
+            />
+          </button>
         ))}
       </div>
     </div>

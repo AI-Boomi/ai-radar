@@ -215,6 +215,12 @@
 /* ===== Utilities ===== */
 @layer utilities{
   /* 3-line truncation for descriptions */
+  .scroll-contain{ overscroll-behavior: contain; } /* keep wheel/touch inside */
+  .scroll-area{
+  overscroll-behavior: contain;      /* keep wheel/touch inside the panel */
+  -webkit-overflow-scrolling: touch; /* momentum on iOS */
+  touch-action: pan-y;               /* allow vertical touch scrolling */
+}
   .line-clamp-3{
     display:-webkit-box;
     -webkit-box-orient:vertical;

@@ -1,34 +1,40 @@
-// src/components/CompanyCard.tsx
 import React from "react";
 import { ExternalLink, MapPin, Calendar } from "lucide-react";
 import { Company } from "../types/company";
 
 interface Props {
   company: Company;
+  /** If true, Website/LinkedIn links will stop propagation so parent onClick isn't triggered */
+  stopCardClickOnLinks?: boolean;
 }
 
-const CompanyCard: React.FC<Props> = ({ company }) => {
+const CompanyCard: React.FC<Props> = ({ company, stopCardClickOnLinks }) => {
   const location = [company.city, company.state, company.country]
     .filter(Boolean)
     .join(", ");
 
+  const stop = (e: React.MouseEvent) => {
+    if (stopCardClickOnLinks) e.stopPropagation();
+  };
+
   return (
     <div className="card-wrap h-full">
       <article className="card rounded-[15px] h-full flex flex-col p-6 text-[#000]">
-        {/* Company name — Degular 40/48 Bold */}
+        {/* Title */}
         <h2 className="font-display text-[40px] leading-[48px] font-[700]">
           {company.name || "Company Name"}
         </h2>
 
+        {/* Category */}
         {company.category ? (
           <div className="mt-3 -ml-1">
-            <span className="badge-purple badge-wrap sm:max-w-[26rem]">
-             {company.category}
-           </span>
+            <span className="badge-purple badge-wrap">
+              {company.category}
+            </span>
           </div>
         ) : null}
 
-        {/* Description — clamp to 3 lines */}
+        {/* Description */}
         {company.description ? (
           <p className="mt-5 font-sans text-[16px] leading-[24px] line-clamp-3">
             {company.description}
@@ -43,6 +49,7 @@ const CompanyCard: React.FC<Props> = ({ company }) => {
               href={company.website}
               target="_blank"
               rel="noreferrer"
+              onClick={stop}
             >
               <ExternalLink className="h-[18px] w-[18px]" />
               Website
@@ -54,6 +61,7 @@ const CompanyCard: React.FC<Props> = ({ company }) => {
               href={company.linkedinProfile}
               target="_blank"
               rel="noreferrer"
+              onClick={stop}
             >
               <ExternalLink className="h-[18px] w-[18px]" />
               Linkedin
@@ -61,13 +69,11 @@ const CompanyCard: React.FC<Props> = ({ company }) => {
           )}
         </div>
 
-        {/* Separator */}
+        {/* Divider */}
         <hr className="mt-8 mb-6 border-t border-[#E8F1DC]" />
 
-        {/* Founders label — per spec */}
+        {/* Founders */}
         <div className="founder-label">// Founders</div>
-
-        {/* Founder names — per spec */}
         {company.founders?.length ? (
           <ul className="mt-3 space-y-1.5">
             {company.founders.map((f) => (
@@ -78,7 +84,7 @@ const CompanyCard: React.FC<Props> = ({ company }) => {
           </ul>
         ) : null}
 
-        {/* Bottom meta pinned — STACKED vertically with tight icon spacing */}
+        {/* Bottom meta (stacked) */}
         <div className="mt-auto pt-8 flex flex-col gap-1 font-display text-[16px] leading-[20px]">
           <div className="inline-flex items-center gap-1.5">
             <MapPin className="h-4 w-4" />
