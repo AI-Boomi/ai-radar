@@ -1,14 +1,45 @@
-import React from "react";
+// src/components/EditCompanySidebar.tsx
+import React, { useMemo, useState } from "react";
 import { Company } from "../types/company";
 
 interface EditCompanySidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  company: Company | null;
+  company?: Company | null;
 }
 
-const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({ isOpen, onClose, company }) => {
-  if (!company) return null;
+const REPO_URL = "https://github.com/AI-Boomi/ai-radar-companies";
+
+const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({
+  isOpen,
+  onClose,
+  company,
+}) => {
+  const [copied, setCopied] = useState(false);
+
+  const companyName = company?.name ?? "your company";
+
+  const currentJson = useMemo(
+    () =>
+      company
+        ? JSON.stringify(company, null, 2)
+        : "// Select a company to see its current data here.",
+    [company]
+  );
+
+  const copyCurrent = async () => {
+    try {
+      await navigator.clipboard.writeText(currentJson);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* noop */
+    }
+  };
+
+  const Divider = () => (
+    <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#60F]/70 to-transparent drop-shadow" />
+  );
 
   return (
     <>
@@ -26,17 +57,18 @@ const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({ isOpen, onClose
         aria-modal="true"
       >
         {/* Header */}
-        <div className="px-6 py-5 border-b border-[#E8F1DC1A] flex items-start justify-between">
+        <div className="shrink-0 px-6 py-6 border-b border-[#E8F1DC1A] flex items-start justify-between">
           <div>
-            <h2 className="sidebar-title text-white">Edit company</h2>
-            <p className="mt-2 text-white/80 text-[14px] leading-[18px]">
-              Update <span className="text-white">{company.name}</span> via GitHub.
+            <h2 className="sidebar-title text-white">Edit your company</h2>
+            <p className="mt-3 font-display text-[14px] leading-[20px] text-white/80">
+              Make changes to your company record on AIBoomi Radar.
             </p>
           </div>
           <button
             onClick={onClose}
             className="social-icon !w-10 !h-10 border-white/30 text-white/90 hover:text-white"
             aria-label="Close"
+            title="Close"
           >
             <span className="text-lg leading-none">×</span>
           </button>
@@ -44,84 +76,143 @@ const EditCompanySidebar: React.FC<EditCompanySidebarProps> = ({ isOpen, onClose
 
         {/* Body */}
         <div
-          className="flex-1 overflow-y-auto scroll-area p-6 space-y-8"
+          className="flex-1 min-h-0 overflow-y-auto scroll-area p-7 space-y-10"
           onWheelCapture={(e) => e.stopPropagation()}
           onTouchMoveCapture={(e) => e.stopPropagation()}
         >
-          {/* Step 1 */}
-          <section className="space-y-3">
-            <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
-              1. Go to the GitHub repository
-            </h3>
-            <div className="pl-6">
+          {/* Intro + Repo button */}
+          <section className="space-y-6">
+            <p className="text-white/80 text-[14px] leading-[20px] text-center max-w-[56ch] mx-auto">
+              Start with accessing our open Github repository
+            </p>
+            <div className="flex justify-center">
               <a
-                href="https://github.com/AI-Boomi/ai-radar-companies"
+                href={REPO_URL}
                 target="_blank"
-                rel="noreferrer"
-                className="btn btn-green inline-flex items-center justify-center px-5 py-2.5 rounded-full"
+                rel="noopener noreferrer"
+                className="btn btn-green inline-flex items-center justify-center px-6 py-3 rounded-full"
               >
                 Open GitHub Repository
               </a>
             </div>
+            <Divider />
           </section>
 
-          {/* Step 2 */}
-          <section className="space-y-3">
-            <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
-              2. Find and edit the JSON
-            </h3>
-            <div className="pl-6 space-y-3">
-              <p className="text-white/80 text-[14px] leading-[20px]">
-                Locate your company entry and update the fields you need.
-              </p>
-              <div className="rounded-lg border border-white/15 bg-white/5 p-3">
-                <div className="text-[12px] text-white/60 mb-1 font-mono">File path</div>
-                <div
-                  className="font-mono text-[13px] bg-black/40 border border-white/10 rounded px-2 py-1 inline-block"
-                  style={{ color: "#00FF4E" }}
-                >
-                  companies.json
+          {/* Steps */}
+          <section className="space-y-7">
+            {/* 1. Locate file */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  1
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Locate the Companies JSON File
+                </h4>
+              </div>
+              <div className="pl-11">
+                <div className="rounded-lg border border-white/15 bg-white/5 p-4 inline-block">
+                  <div className="text-[12px] text-white/60 mb-2 font-mono">File path</div>
+                  <div
+                    className="font-mono text-[13px] bg-black/40 border border-white/10 rounded px-2 py-1 inline-block"
+                    style={{ color: "#00FF4E" }}
+                  >
+                    companies.json
+                  </div>
                 </div>
               </div>
-              <div className="rounded-md border border-amber-400/30 bg-amber-400/10 text-amber-100 text-[13px] leading-[18px] p-3">
-                Keep valid JSON formatting—no stray commas or quotes.
+            </div>
+
+            {/* 2. Find company & edit */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  2
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Find Your Company in the JSON File
+                </h4>
+              </div>
+              <div className="pl-11">
+                <ul className="text-white/80 text-[14px] leading-[20px] list-disc pl-5 space-y-2">
+                  <li>
+                    Click on <code>companies.json</code>
+                  </li>
+                  <li>Click the pencil icon (✏️) to edit the file</li>
+                  <li>
+                    Search for <code>&quot;{companyName}&quot;</code> to find your company entry
+                  </li>
+                  <li>Update the fields you want to change</li>
+                </ul>
               </div>
             </div>
-          </section>
 
-          {/* Step 3: Current data */}
-          <section className="space-y-3">
-            <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
-              3. Current company data
-            </h3>
-            <div className="pl-6 rounded-lg border border-white/15 bg-black/40 p-3 overflow-x-auto">
-              <pre className="text-[12px] leading-[18px] text-white/90 whitespace-pre-wrap">{`{
-  "Name": "${company.name}",
-  "Founded": ${typeof company.founded === "number" ? company.founded : `"${company.founded ?? ""}"`},
-  "Founders": "${(company.founders || []).join(", ")}",
-  "Website": "${company.website ?? ""}",
-  "Category": "${[company.category, ...(company.tags || [])].filter(Boolean).join(", ")}",
-  "Country": "${company.country ?? ""}",
-  "State": "${company.state ?? ""}",
-  "City": "${company.city ?? ""}",
-  "Logo": "${company.logoUrl ?? ""}",
-  "Description": "${(company.description ?? "").replace(/"/g, '\\"')}",
-  "Linkedin Profile URL": "${company.linkedinProfile ?? ""}",
-  "uuid": ${company.id ?? 0}
-}`}</pre>
+            {/* 3. Current company data */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  3
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Your Current Company Data
+                </h4>
+              </div>
+              <div className="pl-11 space-y-4">
+                <p className="text-white/80 text-[14px] leading-[20px]">
+                  Here's your current company information. Update any fields as needed:
+                </p>
+
+                <div className="relative rounded-lg border border-white/15 bg-black/40 p-4">
+                  <button
+                    onClick={copyCurrent}
+                    className="absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/10 text-white text-[12px] hover:bg-white/15"
+                    aria-label="Copy JSON to clipboard"
+                    title="Copy JSON"
+                  >
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                  <pre className="text-[12px] leading-[18px] text-white/90 whitespace-pre-wrap">
+                    {currentJson}
+                  </pre>
+                </div>
+              </div>
             </div>
-          </section>
 
-          {/* Step 4 */}
-          <section className="space-y-3">
-            <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
-              4. Submit your changes
-            </h3>
-            <ul className="pl-6 text-white/80 text-[14px] leading-[20px] list-disc space-y-1">
-              <li>Add a clear commit message</li>
-              <li>Create a new branch &amp; propose changes</li>
-              <li>Open a pull request with a short description</li>
-            </ul>
+            {/* 4. Submit changes */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  4
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Submit Your Changes
+                </h4>
+              </div>
+              <div className="pl-11">
+                <p className="text-white/80 text-[14px] leading-[20px] mb-2">
+                  Once you've made your changes, submit them for review.
+                </p>
+                <ul className="text-white/80 text-[14px] leading-[20px] list-disc pl-5 space-y-2">
+                  <li>Scroll down to &quot;Commit changes&quot; section</li>
+                  <li>
+                    Add a commit message like:{" "}
+                    <code>Update {companyName} information</code>
+                  </li>
+                  <li>
+                    Select &quot;Create a new branch for this commit and start a pull request&quot;
+                  </li>
+                  <li>Click &quot;Propose changes&quot;</li>
+                  <li>Review your changes and click &quot;Create pull request&quot;</li>
+                  <li>Add a description of what you changed and why</li>
+                </ul>
+
+                {/* NEW: boxed success note, same style as the amber "Important" box */}
+                <div className="mt-3 rounded-md border border-amber-400/30 bg-amber-400/10 text-amber-100 text-[13px] leading-[18px] p-3">
+                  ✓ Done! Your changes will be reviewed and merged, updating your company information
+                  on the AI Radar.
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       </aside>
