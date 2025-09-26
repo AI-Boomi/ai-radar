@@ -72,6 +72,38 @@
   }
   .search-input::placeholder{ color:#BFC9AF; }
 
+  /* Make the category pill hug its text, never stretch */
+.badge-hug{
+  display: inline-flex;            /* inline-level flex container */
+  align-self: flex-start;          /* if it ever becomes a flex item, don't stretch */
+  width: -webkit-fit-content;      /* Safari */
+  width: -moz-fit-content;         /* Firefox */
+  width: fit-content;              /* Standard */
+  max-width: 100%;
+  white-space: nowrap;             /* keep it on one line */
+}
+
+/* Category pill: hug content, but never get wider than a cap */
+.badge-wrap{
+  display: inline-block;     /* size to content */
+  align-self: flex-start;    /* don't stretch if parent is flex */
+  width: auto;
+  max-width: 28rem;          /* ← tune this (e.g., 22–32rem) */
+  white-space: normal;       /* allow wrapping */
+  overflow-wrap: anywhere;   /* break long words if needed */
+  word-break: normal;
+  border-radius: 9999px;     /* keeps pill corners while wrapping */
+}
+
+/* Inner text: ellipsis when too long */
+.badge-text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;                /* prevents flex text from forcing growth */
+}
+
+
   /* ---------- Card ---------- */
   .card{
     background: hsl(var(--card));
@@ -80,46 +112,59 @@
     box-shadow: 0 8px 24px rgba(0,0,0,.10);
   }
 
-  /* Stronger, purple glow on hover */
-  .card-hover{
-    position: relative;
-    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-    will-change: transform, box-shadow;
-  }
-  /* soft purple underglow below the card */
-  .card-hover::before{
-    content:"";
-    position:absolute;
-    left:10%;
-    right:10%;
-    bottom:-14px;
-    height:28px;
-    background: radial-gradient(ellipse at center, rgba(122,51,255,.55), rgba(122,51,255,0) 60%);
-    filter: blur(12px);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .32s ease, transform .22s ease;
-  }
-  .card-hover:hover{
-    cursor: pointer;            /* prep for sidebar click */
-    transform: translateY(-4px);
-    border-color:#D6E7BC;
-    box-shadow:
-      0 14px 28px rgba(0,0,0,.16),
-      0 26px 60px rgba(102,0,255,.45);
-  }
-  .card-hover:hover::before{
-    opacity: 1;
-    transform: scale(1.05);
-  }
+  /* Card wrapper that holds the UNDER-glow */
+.card-wrap{
+  position: relative;
+  z-index: 0;            /* creates a stacking context for the glow behind */
+}
+
+/* keep the card above the glow */
+.card-wrap .card{
+  position: relative;
+  z-index: 1;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+
+/* the glow lives on the wrapper, not the card */
+.card-wrap::before{
+  content:"";
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:-16px;          /* below the card */
+  height:32px;
+  border-radius:999px;
+  background: radial-gradient(ellipse at center, rgba(122,51,255,.55), rgba(122,51,255,0) 60%);
+  filter: blur(14px);
+  opacity: 0;
+  pointer-events:none;
+  z-index: -1;           /* explicitly behind the card */
+  transition: opacity .42s ease, transform .22s ease;
+}
+
+/* hover state: lift card + show glow */
+.card-wrap:hover .card{
+  transform: translateY(-4px);
+  border-color:#D6E7BC;
+  box-shadow:
+    0 14px 28px rgba(0,0,0,.16),
+    0 26px 60px rgba(102,0,255,.45);
+}
+.card-wrap:hover::before{
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+
 
   /* ---------- Category badge ---------- */
-  .badge-purple{
-    @apply inline-flex items-center rounded-full px-3 py-1 font-medium;
-    background:#F1E6FF; color:#6600FF;
-    font-family:"Instrument Sans", ui-sans-serif, system-ui;
-    font-size:14px; line-height:18px;
-  }
+ .badge-purple{
+  @apply inline-flex w-fit items-center rounded-full px-3 py-1 font-medium;
+  background:#F1E6FF; color:#6600FF;
+  font-family:"Instrument Sans", ui-sans-serif, system-ui;
+  font-size:14px; line-height:18px;
+}
+
 
   /* ---------- Links (Website / Linkedin) ---------- */
   .link-violet{
@@ -141,6 +186,29 @@
     transform: translateY(-1px);
     background: rgba(191,201,175,.12);
     border-color: #DCE6C9;
+  }
+
+  /* ---------- Founders area (per latest spec) ---------- */
+  .founder-label{
+    color:#000;
+    /* experimental typographic trims (safe if unsupported) */
+    leading-trim: both;
+    text-edge: cap;
+
+    font-family:"Geist Mono", ui-monospace, monospace;
+    font-size:12px;
+    font-style:normal;
+    font-weight:400;     /* per your latest message */
+    line-height:18px;    /* 150% */
+  }
+
+  .founder-name{
+    color:#000;
+    font-family:Degular, ui-sans-serif, system-ui;
+    font-size:16px;
+    font-style:normal;
+    font-weight:700;     /* Desktop/H6/Bold */
+    line-height:20px;    /* 125% */
   }
 }
 
