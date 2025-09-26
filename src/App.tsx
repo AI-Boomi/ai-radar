@@ -20,7 +20,7 @@ const App: React.FC = () => {
   const [companyOpen, setCompanyOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  // inside App component:
+  // Lock page scroll when any sidebar is open
   const anyOpen = addOpen || filterOpen || companyOpen || editOpen;
   useBodyScrollLock(anyOpen);
 
@@ -47,10 +47,15 @@ const App: React.FC = () => {
   }, [companies]);
 
   // Selected filters
+  const CURRENT_YEAR = new Date().getFullYear();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
   const [selectedStates, setSelectedStates] = useState<string[]>([]);
-  const [foundedRange, setFoundedRange] = useState<[number, number]>([2010, 2025]);
+  // default to [2010, currentYear]
+  const [foundedRange, setFoundedRange] = useState<[number, number]>([
+    2010,
+    CURRENT_YEAR,
+  ]);
 
   // Apply filters to companies
   const visibleCompanies: Company[] = useMemo(() => {
@@ -72,6 +77,13 @@ const App: React.FC = () => {
     });
   }, [companies, selectedCategories, selectedCountries, selectedStates, foundedRange]);
 
+  // Badge count for Filters button
+  const filterCount =
+    selectedCategories.length +
+    selectedCountries.length +
+    selectedStates.length +
+    (foundedRange[0] !== 2010 || foundedRange[1] !== CURRENT_YEAR ? 1 : 0);
+
   const openCompany = (c: Company) => {
     setSelectedCompany(c);
     setCompanyOpen(true);
@@ -82,6 +94,7 @@ const App: React.FC = () => {
       <Header
         onOpenAdd={() => setAddOpen(true)}
         onOpenFilters={() => setFilterOpen(true)}
+        activeFilterCount={filterCount} // ← badge
       />
 
       {loading && (
