@@ -1,166 +1,19 @@
-import React from 'react';
-import { X, Github, FileText, GitPullRequest, Plus } from 'lucide-react';
+// src/components/AddCompanySidebar.tsx
+import React, { useMemo, useState } from "react";
 
 interface AddCompanySidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const FORM_URL = "https://aiboomi.typeform.com/to/p54zzzPv";
+
 const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }) => {
-  return (
-    <>
-      {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
-          onClick={onClose}
-        />
-      )}
-      
-      {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-gray-900/95 backdrop-blur-xl border-l border-gray-700/60 z-50 transform transition-transform duration-500 ease-out shadow-2xl ${
-        isOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
-        
-        {/* Header with gradient */}
-        <div className="relative bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600 p-6 shadow-lg">
-          <div className="absolute inset-0 bg-black/30"></div>
-          
-          <div className="relative flex items-start justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="relative flex-shrink-0">
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-cyan-500 to-purple-600 rounded-xl blur-lg opacity-70"></div>
-                <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-white shadow-2xl flex items-center justify-center">
-                  <Plus className="h-8 w-8 text-gray-800" />
-                </div>
-              </div>
-              
-              <div>
-                <h2 className="text-3xl font-black text-white mb-2 drop-shadow-lg">
-                  Add Your Company
-                </h2>
-                <div className="text-white/90 font-medium text-base">
-                  Join the AI Radar via GitHub
-                </div>
-              </div>
-            </div>
-            
-            <button
-              onClick={onClose}
-              className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-lg flex items-center justify-center text-white/80 hover:text-white transition-all duration-200 border border-white/20 hover:scale-110 active:scale-95"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Content */}
-        <div className="p-6 space-y-8 overflow-y-auto" style={{ height: 'calc(100vh - 200px)', paddingBottom: '120px' }}>
-          
-          {/* Introduction */}
-          <div className="bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-purple-500/10 rounded-lg p-6 border border-emerald-500/20">
-            <p className="text-gray-200 text-lg leading-relaxed">
-              Ready to showcase your AI company? Follow these simple steps to add your company to the AI Radar through GitHub.
-            </p>
-          </div>
+  const [copied, setCopied] = useState(false);
 
-          {/* Step 1: Go to GitHub */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                1
-              </div>
-              <h3 className="text-xl font-semibold text-white flex items-center">
-                <Github className="h-5 w-5 mr-2" />
-                Navigate to GitHub Repository
-              </h3>
-            </div>
-            
-            <div className="ml-11 space-y-3">
-              <p className="text-gray-300 text-base leading-relaxed">
-                First, you'll need to access our GitHub repository where all company data is stored.
-              </p>
-              
-              <a
-                href="https://github.com/AI-Boomi/ai-radar-companies"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-4 py-3 bg-gray-800/60 hover:bg-gray-700/60 rounded-lg border border-gray-600/40 hover:border-gray-500/60 text-white transition-all duration-200 group"
-              >
-                <Github className="h-4 w-4 group-hover:scale-110 transition-transform" />
-                <span className="font-medium">Open GitHub Repository</span>
-                <svg className="h-4 w-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          {/* Step 2: Find and Edit JSON */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                2
-              </div>
-              <h3 className="text-xl font-semibold text-white flex items-center">
-                <FileText className="h-5 w-5 mr-2" />
-                Locate the Companies JSON File
-              </h3>
-            </div>
-            
-            <div className="ml-11 space-y-4">
-              <p className="text-gray-300 text-base leading-relaxed">
-                Navigate to the companies data file and add your company information.
-              </p>
-              
-              <div className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/40">
-                <div className="text-sm text-gray-400 mb-2 font-mono">File path:</div>
-                <div className="text-emerald-400 font-mono text-base bg-gray-900/60 px-3 py-2 rounded border border-gray-700/60">
-                  companies.json
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <p className="text-gray-300 text-sm">
-                  <strong className="text-white">Instructions:</strong>
-                </p>
-                <ul className="text-gray-300 text-sm space-y-2 ml-4">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-emerald-400 mt-1">•</span>
-                    <span>Click on <code className="bg-gray-800 px-2 py-1 rounded text-emerald-400">companies.json</code></span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-emerald-400 mt-1">•</span>
-                    <span>Click the pencil icon (✏️) to edit the file</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-emerald-400 mt-1">•</span>
-                    <span>Add your company data at the end of the array (before the closing <code className="bg-gray-800 px-1 rounded text-emerald-400">]</code>)</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Step 3: Company Data Template */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                3
-              </div>
-              <h3 className="text-xl font-semibold text-white">
-                Add Your Company Data
-              </h3>
-            </div>
-            
-            <div className="ml-11 space-y-4">
-              <p className="text-gray-300 text-base leading-relaxed">
-                Copy and customize this template with your company information:
-              </p>
-              
-              <div className="bg-gray-900/60 rounded-lg p-4 border border-gray-700/60 overflow-x-auto">
-                <pre className="text-sm text-gray-300 whitespace-pre-wrap">
-{`{
+  const jsonTemplate = useMemo(
+    () =>
+      `{
   "Name": "Your Company Name",
   "Founded": 2024,
   "Founders": "Founder Name 1, Founder Name 2",
@@ -173,98 +26,241 @@ const AddCompanySidebar: React.FC<AddCompanySidebarProps> = ({ isOpen, onClose }
   "Description": "Brief description of what your company does...",
   "Linkedin Profile URL": "https://linkedin.com/company/yourcompany",
   "uuid": 123
-}`}
-                </pre>
-              </div>
+}`,
+    []
+  );
 
-              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-                <div className="flex items-start space-x-2">
-                  <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-white text-xs font-bold">!</span>
-                  </div>
-                  <div className="text-amber-200 text-sm">
-                    <strong>Important:</strong> Make sure to add a comma after the previous company entry and ensure your JSON is properly formatted.
+  const copyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(jsonTemplate);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {/* noop */}
+  };
+
+  const Divider = () => (
+    <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-[#60F]/70 to-transparent drop-shadow" />
+  );
+
+  return (
+    <>
+      {isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]" onClick={onClose} />
+      )}
+
+      <aside
+        className={`fixed right-0 top-0 w-full max-w-[520px]
+        h-[100dvh] flex flex-col overflow-hidden
+        bg-black/90 backdrop-blur-lg border-l border-[#E8F1DC1A] z-[70]
+        transition-transform duration-300 ease-out
+        ${isOpen ? "translate-x-0" : "translate-x-full"}`}
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Section 1: Title */}
+        <div className="shrink-0 px-6 py-6 border-b border-[#E8F1DC1A] flex items-start justify-between">
+          <div>
+            <h2 className="sidebar-title text-white">Add your company</h2>
+            <p className="mt-3 font-display text-[14px] leading-[20px] text-white/80">
+              Ready to showcase your AI company?
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="social-icon !w-10 !h-10 border-white/30 text-white/90 hover:text-white"
+            aria-label="Close"
+            title="Close"
+          >
+            <span className="text-lg leading-none">×</span>
+          </button>
+        </div>
+
+        {/* Sections 2 & 3 */}
+        <div
+          className="flex-1 min-h-0 overflow-y-auto scroll-area p-7 space-y-10"
+          onWheelCapture={(e) => e.stopPropagation()}
+          onTouchMoveCapture={(e) => e.stopPropagation()}
+        >
+          {/* Section 2: Options (center) */}
+          <section className="space-y-8">
+            {/* Option 1 */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
+                Option 1: Fill out this form
+              </h3>
+              <p className="text-white/80 text-[14px] leading-[20px] max-w-[46ch]">
+                Share your details with us and we’ll add your company to the database.
+              </p>
+              <a
+                href={FORM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-green inline-flex items-center justify-center px-6 py-3 rounded-full"
+              >
+                Add my AI startup
+              </a>
+            </div>
+
+            {/* OR with side dividers */}
+            <div className="flex items-center gap-5">
+              <Divider />
+              <span className="px-3 py-1 rounded-full bg-[#6600FF] text-white text-[12px] font-[700] tracking-wider shadow">
+                OR
+              </span>
+              <Divider />
+            </div>
+
+            {/* Option 2 */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <h3 className="font-display text-white text-[18px] leading-[22px] font-[700]">
+                Option 2: Join AIBoomi Radar via GitHub
+              </h3>
+              <p className="text-white/80 text-[14px] leading-[20px] max-w-[56ch]">
+                Edit our open Github repository and add details yourself. Please follow the
+                instructions given below.
+              </p>
+              <a
+                href="https://github.com/AI-Boomi/ai-radar-companies"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-green inline-flex items-center justify-center px-6 py-3 rounded-full"
+              >
+                Open GitHub Repository
+              </a>
+
+              {/* Faint separator AFTER option 2 button */}
+              <div className="w-full mt-6">
+                <Divider />
+              </div>
+            </div>
+          </section>
+
+          {/* Section 3: How-to steps */}
+          <section className="space-y-7">
+            <h3 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+              How to edit the Github repo and add your data
+            </h3>
+
+            {/* Step 1 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  1
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Locate the Companies JSON File
+                </h4>
+              </div>
+              <div className="pl-11 space-y-4">
+                <p className="text-white/80 text-[14px] leading-[20px]">
+                  Navigate to the companies data file and add your company information.
+                </p>
+                <div className="rounded-lg border border-white/15 bg-white/5 p-4">
+                  <div className="text-[12px] text-white/60 mb-2 font-mono">File path</div>
+                  <div
+                    className="font-mono text-[13px] bg-black/40 border border-white/10 rounded px-2 py-1 inline-block"
+                    style={{ color: "#00FF4E" }}
+                  >
+                    companies.json
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Step 4: Submit Pull Request */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                4
+            {/* Step 2 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  2
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Edit the file
+                </h4>
               </div>
-              <h3 className="text-xl font-semibold text-white flex items-center">
-                <GitPullRequest className="h-5 w-5 mr-2" />
-                Submit Your Pull Request
-              </h3>
-            </div>
-            
-            <div className="ml-11 space-y-4">
-              <p className="text-gray-300 text-base leading-relaxed">
-                Once you've added your company data, submit it for review.
-              </p>
-              
-              <div className="space-y-3">
-                <ul className="text-gray-300 text-sm space-y-2 ml-4">
-                  <li className="flex items-start space-x-2">
-                    <span className="text-purple-400 mt-1">•</span>
-                    <span>Scroll down to "Commit changes" section</span>
+              <div className="pl-11">
+                <ul className="text-white/80 text-[14px] leading-[20px] list-disc pl-5 space-y-2">
+                  <li>
+                    Click on <code>companies.json</code>
                   </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-purple-400 mt-1">•</span>
-                    <span>Add a commit message like: <code className="bg-gray-800 px-2 py-1 rounded text-purple-400">"Add [Your Company Name] to AI Radar"</code></span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-purple-400 mt-1">•</span>
-                    <span>Select "Create a new branch for this commit and start a pull request"</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-purple-400 mt-1">•</span>
-                    <span>Click "Propose changes"</span>
-                  </li>
-                  <li className="flex items-start space-x-2">
-                    <span className="text-purple-400 mt-1">•</span>
-                    <span>Review your changes and click "Create pull request"</span>
+                  <li>Click the pencil icon (✏️) to edit the file</li>
+                  <li>
+                    Add your company data at the end of the array (before the closing{" "}
+                    <code style={{ color: "#00FF4E" }}>]</code>)
                   </li>
                 </ul>
               </div>
+            </div>
 
-              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4">
-                <div className="flex items-start space-x-2">
-                  <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <span className="text-white text-xs font-bold">✓</span>
-                  </div>
-                  <div className="text-emerald-200 text-sm">
-                    <strong>That's it!</strong> Your pull request will be reviewed and merged, adding your company to the AI Radar.
-                  </div>
+            {/* Step 3 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  3
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Add Your Company Data
+                </h4>
+              </div>
+              <div className="pl-11 space-y-4">
+                <p className="text-white/80 text-[14px] leading-[20px]">
+                  Copy and customize this template with your company information:
+                </p>
+
+                <div className="relative rounded-lg border border-white/15 bg-black/40 p-4">
+                  <button
+                    onClick={copyJson}
+                    className="absolute top-3 right-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/20 bg-white/10 text-white text-[12px] hover:bg-white/15"
+                    aria-label="Copy JSON to clipboard"
+                    title="Copy JSON"
+                  >
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                  <pre className="text-[12px] leading-[18px] text-white/90 whitespace-pre-wrap">
+                    {jsonTemplate}
+                  </pre>
+                </div>
+
+                <div className="rounded-md border border-amber-400/30 bg-amber-400/10 text-amber-100 text-[13px] leading-[18px] p-3">
+                  <strong className="text-amber-200">Important:</strong> Make sure to add a comma
+                  after the previous company entry and ensure your JSON is properly formatted.
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Help Section */}
-          <div className="bg-gray-800/40 rounded-lg p-6 border border-gray-700/40">
-            <h4 className="text-lg font-semibold text-white mb-3">Need Help?</h4>
-            <p className="text-gray-300 text-sm leading-relaxed mb-4">
-              If you're new to GitHub or need assistance, feel free to reach out or check GitHub's documentation on creating pull requests.
-            </p>
-            <a
-              href="https://github.com/AI-Boomi/ai-radar-companies"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors text-sm"
-            >
-              <span>View Repository</span>
-              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          </div>
+            {/* Step 4 */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-8 w-8 rounded-full grid place-items-center bg-white/10 border border-white/20 text-white">
+                  4
+                </span>
+                <h4 className="font-display text-white text-[16px] leading-[20px] font-[700]">
+                  Submit Your Pull Request
+                </h4>
+              </div>
+              <div className="pl-11">
+                <p className="text-white/80 text-[14px] leading-[20px] mb-2">
+                  Once you've added your company data, submit it for review.
+                </p>
+                <ul className="text-white/80 text-[14px] leading-[20px] list-disc pl-5 space-y-2">
+                  <li>Scroll down to &quot;Commit changes&quot; section</li>
+                  <li>
+                    Add a commit message like: <code>Add [Your Company Name] to AI Radar</code>
+                  </li>
+                  <li>
+                    Select &quot;Create a new branch for this commit and start a pull request&quot;
+                  </li>
+                  <li>Click &quot;Propose changes&quot;</li>
+                  <li>Review your changes and click &quot;Create pull request&quot;</li>
+                </ul>
+                <div className="mt-3 text-white/80 text-[14px] leading-[20px]">
+                  ✓ That’s it! Your pull request will be reviewed and merged, adding your company to
+                  the AI Radar.
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
+      </aside>
     </>
   );
 };

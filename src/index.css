@@ -1,3 +1,223 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== Theme tokens (HSL for easy theming) ===== */
+:root{
+  --bg: 0 0% 0%;               /* page background: #000 */
+  --fg: 0 0% 98%;              /* base text on black */
+  --border: 0 0% 18%;
+
+  /* Company card */
+  --card: 90 100% 96%;         /* #F8FFE9 */
+  --card-foreground: 0 0% 0%;  /* black text */
+
+  /* Accent / primary */
+  --primary-500: 259 95% 60%;
+  --primary-600: 259 95% 54%;
+  --primary-700: 259 95% 48%;
+  --accent: 145 92% 48%;       /* CTA green */
+}
+
+/* ===== Base ===== */
+@layer base{
+  html{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body{ @apply bg-background text-foreground font-sans; }
+}
+
+/* =========================================================
+   Components & Effects
+   ========================================================= */
+@layer components{
+  /* ---------- Buttons ---------- */
+  .btn{ @apply inline-flex items-center gap-2 font-medium transition-all; }
+
+  .btn-green{
+    @apply rounded-full px-5 py-2;
+    background:#00FF66; color:#000;
+    transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+  }
+  .btn-green:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,255,102,.35); }
+  .btn-green:active{ transform: translateY(0); box-shadow:none; }
+
+  .btn-outline{
+    @apply rounded-full px-5 py-2;
+    border:1px solid rgba(255,255,255,.30); color:#fff;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+  }
+  .btn-outline:hover{ background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.5); }
+
+  /* ---------- Sidebar title (matches card H2/Bold) ---------- */
+  .sidebar-title{
+    @apply font-display text-[28px] leading-[34px] sm:text-[32px] sm:leading-[38px] lg:text-[40px] lg:leading-[48px] font-[700];
+  }
+
+  /* ---------- Body / labels helpers for sidebars ---------- */
+  /* Body copy: Instrument Sans / 16 / 24 / regular */
+  .body-regular{
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, -apple-system,
+      "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Section label for // Founders in sidebars: Geist Mono / 12 / 18 / regular */
+  .label-founders{
+    font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+      Consolas, "Liberation Mono", "Courier New", monospace !important;
+    font-size: 12px !important;
+    line-height: 18px !important;
+    font-weight: 400 !important;
+    color: rgb(255 255 255 / 0.8) !important;
+  }
+
+  /* ---------- Circular search button (wrap for the SVG) ---------- */
+  .btn-round{
+    @apply grid place-items-center;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn-round:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,255,102,.35); }
+  .btn-round:active{ transform: translateY(0); box-shadow:none; }
+
+  /* ---------- Search pill ---------- */
+  .search-pill{
+    border:1px solid #6600FF; background:#2D0070;
+    transition: box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+  }
+  .search-pill:hover{
+    box-shadow: 0 0 0 1px #7A33FF, 0 0 24px rgba(102,0,255,.30);
+  }
+  .search-pill:focus-within{
+    box-shadow: 0 0 0 2px #7A33FF, 0 0 36px rgba(102,0,255,.45);
+  }
+  .search-input{
+    @apply font-sans bg-transparent outline-none w-full;
+    font-size:18px; line-height:26px; font-weight:400; color:#BFC9AF;
+  }
+  .search-input::placeholder{ color:#BFC9AF; }
+
+  /* ---------- Category pills (hug content) ---------- */
+  .badge-hug{
+    display: inline-flex;
+    align-self: flex-start;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .badge-wrap{
+    display: inline-block;
+    align-self: flex-start;
+    width: auto;
+    max-width: 28rem;          /* tune as needed */
+    white-space: normal;       /* allow wrapping */
+    overflow-wrap: anywhere;
+    word-break: normal;
+    border-radius: 9999px;
+  }
+
+  .badge-text{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  /* ---------- Card ---------- */
+  .card{
+    background: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+    border: 1px solid #E8F1DC;
+    box-shadow: 0 8px 24px rgba(0,0,0,.10);
+  }
+
+  /* Card wrapper that holds the UNDER-glow */
+  .card-wrap{ position: relative; z-index: 0; }
+  .card-wrap .card{
+    position: relative; z-index: 1;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .card-wrap::before{
+    content:"";
+    position:absolute;
+    left:10%; right:10%; bottom:-16px; height:32px;
+    border-radius:999px;
+    background: radial-gradient(ellipse at center, rgba(122,51,255,.55), rgba(122,51,255,0) 60%);
+    filter: blur(14px);
+    opacity: 0; pointer-events:none; z-index: -1;
+    transition: opacity .42s ease, transform .22s ease;
+  }
+  .card-wrap:hover .card{
+    transform: translateY(-4px);
+    border-color:#D6E7BC;
+    box-shadow:
+      0 14px 28px rgba(0,0,0,.16),
+      0 26px 60px rgba(102,0,255,.45);
+  }
+  .card-wrap:hover::before{ opacity: 1; transform: scale(1.05); }
+
+  /* ---------- Category badge visual ---------- */
+  .badge-purple{
+    @apply inline-flex w-fit items-center rounded-full px-3 py-1 font-medium;
+    background:#F1E6FF; color:#6600FF;
+    font-family:"Instrument Sans", ui-sans-serif, system-ui;
+    font-size:14px; line-height:18px;
+  }
+
+  /* ---------- Links (Website / Linkedin on cards) ---------- */
+  .link-violet{
+    color:#6600FF; text-decoration:none;
+    transition: color .15s ease, text-underline-offset .15s ease;
+  }
+  .link-violet:hover{ color:#7A33FF; text-decoration:underline; text-underline-offset:2px; }
+
+  /* ---------- Social icon chips ---------- */
+  .social-icon{
+    @apply inline-flex items-center justify-center rounded-full;
+    width:44px; height:44px; color:#BFC9AF;
+    border:1px solid rgba(191,201,175,.70);
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+  }
+  .social-icon:hover{
+    transform: translateY(-1px);
+    background: rgba(191,201,175,.12);
+    border-color: #DCE6C9;
+  }
+
+  /* ---------- Founders area on CARD (black text spec) ---------- */
+  .founder-label{
+    color:#000;
+    leading-trim: both;
+    text-edge: cap;
+    font-family:"Geist Mono", ui-monospace, monospace;
+    font-size:12px; font-style:normal; font-weight:400; line-height:18px;
+  }
+  .founder-name{
+    color:#000;
+    font-family:Degular, ui-sans-serif, system-ui;
+    font-size:16px; font-style:normal; font-weight:700; line-height:20px;
+  }
+}
+
+/* ===== Utilities ===== */
+@layer utilities{
+  /* Keep wheel/touch inside sidebars */
+  .scroll-contain{ overscroll-behavior: contain; }
+  .scroll-area{
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  /* 3-line truncation for descriptions (cards) */
+  .line-clamp-3{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+    overflow:hidden;
+  }
+}
