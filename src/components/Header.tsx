@@ -1,60 +1,94 @@
+// src/components/Header.tsx
 import React from "react";
-import { Linkedin, Twitter, MessageCircle } from "lucide-react";
+import { Linkedin, Twitter, MessageCircle, Plus, SlidersHorizontal } from "lucide-react";
 import { SiDiscord } from "react-icons/si";
 
 type Props = {
   onOpenAdd: () => void;
   onOpenFilters: () => void;
-  activeFilterCount?: number; // ← new (optional)
+  activeFilterCount?: number;
 };
-
-const LOGO_HEIGHT_PX = 35;
-const HEADER_HEIGHT_PX = 200;
 
 const Header: React.FC<Props> = ({ onOpenAdd, onOpenFilters, activeFilterCount = 0 }) => {
   return (
     <header className="relative">
-      <div
-        className="w-full bg-gradient-to-b from-[#35078D] to-[#000000]"
-        style={{ height: HEADER_HEIGHT_PX }}
-      />
+      {/* Taller on mobile to add space before the search bar below */}
+      <div className="w-full bg-gradient-to-b from-[#35078D] to-[#000000] h-[240px] md:h-[200px]" />
       <div className="absolute inset-0">
         <div className="h-full max-w-[1400px] mx-auto px-4 md:px-8 flex flex-col pt-12 md:pt-20">
           {/* Row 1: Logo + buttons */}
           <div className="flex items-center justify-between">
             <a href="/" className="inline-flex items-center">
-              <img
-                src="/assets/Radar-logo.svg"
-                alt="AIBoomi Radar"
-                style={{ height: LOGO_HEIGHT_PX }}
-                className="block"
-                draggable={false}
-              />
-            </a>
+  <img
+    src="/assets/Radar-logo.svg"
+    alt="AIBoomi Radar"
+    className="block h-7 md:h-9 lg:h-10" // 28px / 36px / 40px
+    draggable={false}
+  />
+</a>
 
+            {/* Actions: icon-only on mobile, original text buttons on desktop */}
             <div className="flex items-center gap-3">
-              <button className="btn btn-green" type="button" onClick={onOpenAdd}>
-                Add your company
-              </button>
+              {/* Mobile (icon buttons) */}
+              <div className="flex md:hidden items-center gap-2">
+                {/* Filters (with badge if active) */}
+                <button
+                  className="relative social-icon"
+                  type="button"
+                  onClick={onOpenFilters}
+                  aria-label={`Filters${activeFilterCount ? `, ${activeFilterCount} active` : ""}`}
+                  title="Filters"
+                >
+                  <SlidersHorizontal className="h-5 w-5" />
+                  {activeFilterCount > 0 && (
+                    <span
+                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1.5
+                                 rounded-full bg-[#FF3B30] text-white text-[11px] font-semibold
+                                 leading-[18px] text-center ring-2 ring-black"
+                      aria-live="polite"
+                    >
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </button>
 
-              <button
-                className="relative btn btn-outline"
-                type="button"
-                onClick={onOpenFilters}
-                aria-label={`Filters${activeFilterCount ? `, ${activeFilterCount} active` : ""}`}
-              >
-                Filters
-                {activeFilterCount > 0 && (
-                  <span
-                    className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1.5
-                               rounded-full bg-[#FF3B30] text-white text-[11px] font-semibold
-                               leading-[18px] text-center ring-2 ring-black"
-                    aria-live="polite"
-                  >
-                    {activeFilterCount}
-                  </span>
-                )}
-              </button>
+                {/* Add company */}
+                <button
+                  className="social-icon"
+                  type="button"
+                  onClick={onOpenAdd}
+                  aria-label="Add your company"
+                  title="Add your company"
+                >
+                  <Plus className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Desktop (original text buttons) */}
+              <div className="hidden md:flex items-center gap-3">
+                <button className="btn btn-green" type="button" onClick={onOpenAdd}>
+                  Add your company
+                </button>
+
+                <button
+                  className="relative btn btn-outline"
+                  type="button"
+                  onClick={onOpenFilters}
+                  aria-label={`Filters${activeFilterCount ? `, ${activeFilterCount} active` : ""}`}
+                >
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span
+                      className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1.5
+                                 rounded-full bg-[#FF3B30] text-white text-[11px] font-semibold
+                                 leading-[18px] text-center ring-2 ring-black"
+                      aria-live="polite"
+                    >
+                      {activeFilterCount}
+                    </span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
 
