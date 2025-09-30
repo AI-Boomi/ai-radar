@@ -13,3 +13,19 @@ export interface Company {
   description: string;
   linkedinProfile: string;
 }
+
+export interface RawCompanyData {
+  uuid: string;
+  Name: string;
+  Founded: number;
+  Founders: string[];
+  Website: string;
+  Category: string;
+  Tags: string[];
+  Country: string;
+  State: string;
+  City: string;
+  Logo: string;
+  Description: string;
+  "Linkedin Profile URL": string;
+}
