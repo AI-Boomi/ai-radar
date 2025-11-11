@@ -11,28 +11,29 @@ class GeminiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = '/.netlify/functions/gemini-search';
+    this.baseUrl = '/.netlify/edge-functions/gemini-search';
     console.log('🔧 GeminiService initialized with baseUrl:', this.baseUrl);
   }
 
-  async parseSearchQuery(query: string, availableData: {
-    categories: string[];
-    locations: string[];
-    companies: any[];
-  }): Promise<SearchFilters> {
+  async parseSearchQuery(query: string, availableData: { categories: string[]; locations: string[]; companies: any[]; }): Promise<SearchFilters> {
     console.log('🔍 Starting AI search with query:', query);
     console.log('📊 Available data:', JSON.stringify(availableData, null, 2));
-    
+
     try {
+      const payload = {
+        query,
+        availableData: { categories: availableData.categories, companies: availableData.companies, }
+      };
+
+      console.log('📤 Sending payload to Gemini service...');
+      console.log('📦 Payload size:', JSON.stringify(payload).length, 'bytes');
+
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          query,
-          availableData
-        })
+        body: JSON.stringify(payload)
       });
 
       console.log('📡 Response status:', response.status);
@@ -46,8 +47,7 @@ class GeminiService {
 
       const filters = await response.json();
       console.log('✅ AI filters received:', JSON.stringify(filters, null, 2));
-      
-      // Validate the response structure
+
       if (!filters || typeof filters !== 'object') {
         throw new Error('Invalid response format from AI');
       }
@@ -62,7 +62,7 @@ class GeminiService {
       };
     } catch (error) {
       console.error('💥 Gemini service error:', error);
-      throw error; // Re-throw the error instead of falling back
+      throw error;
     }
   }
 }
