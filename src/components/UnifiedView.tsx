@@ -61,6 +61,7 @@ const UnifiedView: React.FC<Props> = ({ companies, onOpenCompany }) => {
   }, [companies, query, aiFilters]);
   
   const handleSearch = async () => {
+    console.log('--- handleSearch function executed ---'); // Added log
     if (!query.trim()) return;
     const categories = Array.from(new Set(companies.map(c => c.category).filter(Boolean))) as string[];
     console.log('🔍 Triggering AI search with query:', query);
