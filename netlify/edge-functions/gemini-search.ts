@@ -107,7 +107,7 @@ Return ONLY the JSON filter object, no other text.`;
     console.log('🤖 Sending enhanced prompt to Gemini...');
     
     // Call Gemini API
-    const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+    const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
     
     const response = await fetch(`${geminiUrl}?key=${apiKey}`, {
       method: 'POST',

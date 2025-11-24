@@ -11,7 +11,7 @@ class GeminiService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = '/.netlify/edge-functions/gemini-search';
+    this.baseUrl = '/.netlify/functions/gemini-search';
     console.log('🔧 GeminiService initialized with baseUrl:', this.baseUrl);
   }
 

@@ -61,12 +61,14 @@ const UnifiedView: React.FC<Props> = ({ companies, onOpenCompany }) => {
   }, [companies, query, aiFilters]);
   
   const handleSearch = async () => {
+    console.log('--- handleSearch function executed ---'); // Added log
     if (!query.trim()) return;
     const categories = Array.from(new Set(companies.map(c => c.category).filter(Boolean))) as string[];
     console.log('🔍 Triggering AI search with query:', query);
     console.log('📊 Available categories:', categories);
     console.log('📦 Total companies:', companies.length);
     const filters = await searchWithAI(query, { categories, locations: [], companies, });
+    console.log('🔍 searchWithAI returned filters:', filters); // Added log
     if (filters) {
       console.log('✅ AI filters applied:', filters);
       setAiFilters(filters);
@@ -74,6 +76,7 @@ const UnifiedView: React.FC<Props> = ({ companies, onOpenCompany }) => {
       console.error('❌ Failed to get AI filters');
       setAiFilters(null);
     }
+    console.log('🔍 aiFilters state after handleSearch:', aiFilters); // Added log
   };
   
   const handleClearFilters = () => {
