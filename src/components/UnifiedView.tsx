@@ -110,7 +110,7 @@ const UnifiedView: React.FC<Props> = ({ companies, onOpenCompany }) => {
         )}
       </div>
       <div className="mt-10 h-px w-full" style={{ background: "rgba(232, 241, 220, 0.7)" }} />
-      <div className="mt-6 text-sm" style={{ color: SEARCH_TEXT }}>Found {filtered.length} company{filtered.length !== 1 ? "ies" : ""}</div>
+      <div className="mt-6 text-sm" style={{ color: SEARCH_TEXT }}>Found {filtered.length} compan{filtered.length === 1 ? 'y' : 'ies'}</div>
       <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-7 items-stretch">
         {filtered.map((c) => (
           <button key={c.id} type="button" onClick={() => onOpenCompany(c)} className="text-left h-full focus:outline-none" style={{ WebkitTapHighlightColor: "transparent" }}>
